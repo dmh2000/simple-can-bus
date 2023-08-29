@@ -1,9 +1,11 @@
 # can_iot
+
 sample canbus end-to-end
 
 ## install vcan and can-utils
 
 ### VCAN
+
 ```bash
 #!/bin/bash
 # Load the kernel module.
@@ -15,6 +17,7 @@ sudo ip link set up vcan0
 ```
 
 ### can-utils
+
 ```bash
 
 # INSTALL
@@ -32,6 +35,3 @@ cansend vcan0 123#00FFAA5501020304
 
 ./vcan/sender.c
 ./vcan/receiver.c
-
-
-
