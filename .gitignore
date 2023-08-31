@@ -39,8 +39,6 @@ go.work
 *.lo
 *.map
 Mkfile.old
-*.mod
-*.mod*
 modules.order
 Module.symvers
 *.o
