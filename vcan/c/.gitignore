@@ -1,0 +1,3 @@
+canlib_test_receive
+canlib_test_send
+libcan.so

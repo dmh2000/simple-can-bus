@@ -9,8 +9,8 @@
 // modeled after linux can.h/can_frame repeated for convenience
 typedef struct canlib_frame
 {
-    uint32_t can_id;       /* 32 bit CAN_ID + EFF/RTR/ERR flags */
-    unsigned char can_dlc; /* frame payload length in byte (0 .. CAN_MAX_DATA_LEN) */
+    uint32_t can_id; /* 32 bit CAN_ID + EFF/RTR/ERR flags */
+    uint8_t can_dlc; /* frame payload length in byte (0 .. CAN_MAX_DATA_LEN) */
     unsigned char data[CAN_MAX_DATA_LEN];
 } canlib_frame_t;
 
