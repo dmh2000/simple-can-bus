@@ -7,3 +7,4 @@ all:
 clean:
 	$(MAKE) -C c clean
 	$(MAKE) -C g clean	
+
