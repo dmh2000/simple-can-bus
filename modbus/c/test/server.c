@@ -1,18 +1,23 @@
 #include "../inc/modbus.h"
-#include <arpa/inet.h>
-#include <errno.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <stdio.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
+
+mbtcp_adu_t modbus_sim(mbtcp_adu_t *adu) {
+    mbtcp_adu_t adu_out;
+    adu_out.mbap.tid = adu->mbap.tid;
+    adu_out.mbap.pid = 0;
+    adu_out.mbap.len = 5;
+    adu_out.pdu.fc = adu->pdu.fc;
+    adu_out.pdu.data[0] = 3;
+    adu_out.pdu.data[1] = 2;
+    adu_out.pdu.data[2] = 1;
+    return adu_out;
+}
 
 int main(int argc, char *argv[]) {
     int sockfd;
     int status;
-    mbtcp_adu_t adu;
+    mbtcp_adu_t adu_in;
+    mbtcp_adu_t adu_out;
 
     const char *ip = "127.0.0.1";
     uint16_t port = 5000;
@@ -23,43 +28,34 @@ int main(int argc, char *argv[]) {
     }
 
     for (;;) {
-        struct sockaddr_in client_addr;
-        socklen_t client_addr_len = sizeof(client_addr);
-        int clientfd =
-            accept(sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
-        if (status < 0) {
-            perror("accept");
+        int clientfd = mbtcp_server_accept(sockfd);
+        if (clientfd < 0) {
+            perror("mbtcp_server_accept");
             return -1;
         }
-        printf("client connected %08x:%u\n", client_addr.sin_addr.s_addr,
-               client_addr.sin_port);
 
         for (;;) {
-            status = mbtcp_recv(clientfd, &adu, 10000);
+            status = mbtcp_recv(clientfd, &adu_in, 10000);
             if (status < 0) {
                 perror("mbtcp_recv");
-                return -1;
+                break;
             }
 
             if (status == 0) {
                 printf("timeout\n");
-                continue;
+                break;
             }
 
-            mbtcp_print_adu(&adu);
+            mbtcp_print_adu(&adu_in);
 
-            adu.mbap.tid = adu.mbap.tid;
-            adu.mbap.pid = 0;
-            adu.mbap.len = 5;
-            adu.pdu.fc = adu.pdu.fc;
-            adu.pdu.data[0] = 3;
-            adu.pdu.data[1] = 2;
-            adu.pdu.data[2] = 1;
-            status = mbtcp_send(clientfd, &adu);
+            adu_out = modbus_sim(&adu_in);
+
+            status = mbtcp_send(clientfd, &adu_out);
             if (status < 0) {
                 perror("mbtcp_send");
-                return -1;
+                break;
             }
         }
+        mbtcp_close(clientfd);
     }
 }
