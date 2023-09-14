@@ -82,6 +82,7 @@ func TestCanReceive1(t *testing.T) {
 		}
 
 		ret = CanSend(sock, &frame)
+		t.Log("sent frame")
 		if ret < 0 {
 			t.Error("CanSend failed")
 		}
@@ -102,9 +103,18 @@ func TestCanReceive1(t *testing.T) {
 		var frame CanFrame
 
 		// run cansend vcan0 in another terminal to see the frame
-		ret = CanRecv(sock, &frame)
+		ret = CanRecv(sock, &frame, 10000)
+		t.Log("received frame or timeout")
 		if ret < 0 {
 			t.Error("CanSend failed")
+		}
+
+		if ret == 0 {
+			t.Error("CanRecv timed out")
+		}
+
+		if ret != 16 {
+			t.Error(fmt.Printf("CanRecv did not receive 16 bytes %d", ret))
 		}
 
 		if frame.CanId != 99 {
@@ -161,6 +171,7 @@ func TestCanReceive2(t *testing.T) {
 		if ret < 0 {
 			t.Error("CanSend failed")
 		}
+		t.Log("sent frame")
 
 		ret = CanClose(sock)
 
@@ -177,10 +188,17 @@ func TestCanReceive2(t *testing.T) {
 
 		var frame CanFrame
 
-		// run cansend vcan0 in another terminal to see the frame
-		ret = CanRecv(sock, &frame)
+		ret = CanRecv(sock, &frame, 10000)
+		t.Log("received frame or timeout")
 		if ret < 0 {
 			t.Error("CanSend failed")
+		}
+		if ret == 0 {
+			t.Error("CanRecv timed out")
+		}
+
+		if ret != 16 {
+			t.Error(fmt.Printf("CanRecv did not receive 16 bytes %d", ret))
 		}
 
 		if frame.CanId != 1 {
@@ -210,7 +228,7 @@ func TestCanReceive2(t *testing.T) {
 	wg.Add(2)
 
 	go recv(&wg) // blocks
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 	go send(&wg)
 	wg.Wait()
 

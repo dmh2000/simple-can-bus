@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
 #include "canlib.h"
 
 int main(int argc, char *argv[])
@@ -8,13 +9,7 @@ int main(int argc, char *argv[])
     int status;
     canlib_frame_t frame;
 
-    if (argc < 2)
-    {
-        printf("Usage: %s <CAN interface>\n", argv[0]);
-        return 1;
-    }
-
-    can_sock = canlib_init(argv[1]);
+    can_sock = canlib_init("vcan0");
     if (can_sock < 0)
     {
         printf("Error initializing CAN interface %s\n", argv[1]);
@@ -28,11 +23,15 @@ int main(int argc, char *argv[])
         frame.data[i] = i;
     }
 
-    status = canlib_send(can_sock, &frame);
-    if (status < 0)
+    for (;;)
     {
-        printf("Error reading CAN frame\n");
-        return 1;
+        status = canlib_send(can_sock, &frame);
+        if (status < 0)
+        {
+            printf("Error reading CAN frame\n");
+            return 1;
+        }
+        sleep(1);
     }
 
     return 0;

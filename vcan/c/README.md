@@ -12,7 +12,7 @@ int canlib_init(const char *can_dev);
 
 // receive a single can frame message and populate the can_frame
 // @return number of bytes received or < 0 if failed
-int canlib_receive(int can_sock, canlib_frame_t *can_frame);
+int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms);
 
 // send a single can frame message from the input can_frame
 // @returns number of bytes sent or < 0 if failed

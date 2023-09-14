@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net" modified="2023-09-14T15:41:22.343Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36" etag="4qLuBjxTH3JWIn6NyN4r" version="21.7.5" type="device">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="1083" dy="783" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#1C1C1C" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;startArrow=classic;startFill=1;fillColor=#e51400;strokeColor=#B20000;strokeWidth=5;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ozyOs6aiq1wP1_BL-jvp-0" target="ozyOs6aiq1wP1_BL-jvp-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-0" value="&lt;br&gt;&lt;br&gt;&amp;nbsp; Web Client&lt;br&gt;&amp;nbsp; (react,typescript)&lt;br&gt;&lt;br&gt;&lt;div style=&quot;&quot;&gt;&amp;nbsp; CAN set&amp;nbsp; power&amp;nbsp; &amp;nbsp;1 int32&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&amp;nbsp; CAN set&amp;nbsp; settings 2 uint16&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&amp;nbsp; CAN get&amp;nbsp; rpm&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;3 int32&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&amp;nbsp; CAN get&amp;nbsp; statuc&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;4 uint16l&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&amp;nbsp; MB coil&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; 1&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; MB register&amp;nbsp; 2&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; MB hold&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;3&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; MB input&amp;nbsp; &amp;nbsp; &amp;nbsp; 4&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="80" y="160" width="160" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-1" value="&amp;nbsp;&amp;nbsp;&lt;br&gt;&amp;nbsp; API Endpoint&lt;br&gt;&amp;nbsp; (go + gorilla)&lt;br&gt;&lt;br&gt;&amp;nbsp; /can/1 (PUT) DAC&lt;br&gt;&amp;nbsp; /can/2 (PUT) DIO in&lt;br&gt;&amp;nbsp; /can/3 (GET) ADC&lt;br&gt;&amp;nbsp; /can/4 (GET) DIO out&lt;br&gt;&lt;br&gt;&amp;nbsp; /modbus/1 (PUT)&amp;nbsp; &lt;br&gt;&amp;nbsp; /modbus/2 (PUT)&lt;br&gt;&amp;nbsp; /modbus/3 (GET)&lt;br&gt;&amp;nbsp; /modbus/4 (GET)&lt;br&gt;&lt;div style=&quot;&quot;&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="320" y="160" width="160" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;startArrow=classic;startFill=1;fillColor=#e51400;strokeColor=#B20000;strokeWidth=4;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ozyOs6aiq1wP1_BL-jvp-3" target="ozyOs6aiq1wP1_BL-jvp-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-3" value="can simulator&lt;br&gt;(go)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="540" y="190" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;fillColor=#e51400;strokeColor=#B20000;strokeWidth=4;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ozyOs6aiq1wP1_BL-jvp-5" target="ozyOs6aiq1wP1_BL-jvp-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-5" value="modbus simulator&lt;br&gt;(go)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="540" y="310" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;fillColor=#e51400;strokeColor=#B20000;strokeWidth=4;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ozyOs6aiq1wP1_BL-jvp-7" target="ozyOs6aiq1wP1_BL-jvp-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-7" value="can IO module&lt;br&gt;(go)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="690" y="190" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=classic;startFill=1;fillColor=#e51400;strokeColor=#B20000;strokeWidth=4;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ozyOs6aiq1wP1_BL-jvp-9" target="ozyOs6aiq1wP1_BL-jvp-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-9" value="canlib.so&lt;br&gt;(C)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="840" y="190" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#e51400;strokeColor=#B20000;startArrow=classic;startFill=1;strokeWidth=4;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="ozyOs6aiq1wP1_BL-jvp-11" target="ozyOs6aiq1wP1_BL-jvp-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ozyOs6aiq1wP1_BL-jvp-11" value="linux&lt;br&gt;VCAN" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="990" y="190" width="90" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -2,6 +2,8 @@
 
 Standard CAN bus on linux uses a network/socket paradigm.
 
+The functions in this library rely on the C library in "../c".
+
 ```go
 type CanFrame struct {
 	CanId  uint32	// CAN message ID

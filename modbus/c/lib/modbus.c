@@ -36,7 +36,7 @@ int mbtcp_client_connect(const char *server_ip, uint16_t server_port) {
 }
 
 // TCP server bind-listen-accept
-// @return socket descriptor or -1 on error
+// @return server socket descriptor or -1 on error
 int mbtcp_server_listen(const char *local_ip, uint16_t local_port) {
     int status;
 
@@ -68,6 +68,22 @@ int mbtcp_server_listen(const char *local_ip, uint16_t local_port) {
     }
 
     return sockfd;
+}
+
+// TCP server accept
+// @return client socket descriptor or -1 on error
+int mbtcp_server_accept(int sockfd) {
+    int status;
+
+    struct sockaddr_in client_addr;
+    socklen_t client_addr_len = sizeof(client_addr);
+    int clientfd =
+        accept(sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
+    if (status < 0) {
+        return -1;
+    }
+
+    return clientfd;
 }
 
 // TCP send
@@ -144,6 +160,11 @@ int mbtcp_recv(int sockfd, mbtcp_adu_t *adu, uint32_t timeout_ms) {
     }
 }
 
+// TCP close socket
+// @return 0 on success or -1 on error
+int mbtcp_close(int sockfd) { return close(sockfd); }
+
+// print modbus adu for debugging
 void mbtcp_print_adu(const mbtcp_adu_t *adu) {
     printf("tid:%u pid;%u len:%u uid:%u fc:%u\n", adu->mbap.tid, adu->mbap.pid,
            adu->mbap.len, adu->mbap.uid, adu->pdu.fc);

@@ -7,6 +7,7 @@ package can
 struct canlib_frame;
 */
 import "C"
+import "fmt"
 
 // note : sizeof canlib_frame is 16 bytes due to padding alignment
 type CanFrame struct {
@@ -37,10 +38,10 @@ func CanSend(sock int, frame *CanFrame) int {
 }
 
 // CanRecv receives a frame from the socket, blocking
-func CanRecv(sock int, frame *CanFrame) int {
+func CanRecv(sock int, frame *CanFrame, timeout int) int {
 	var ret C.int
 	var cframe C.struct_canlib_frame
-	ret = C.canlib_receive(C.int(sock), &cframe)
+	ret = C.canlib_receive(C.int(sock), &cframe, C.int(timeout))
 	frame.CanId = uint32(cframe.can_id)
 	frame.CanDlc = byte(cframe.can_dlc)
 
@@ -55,4 +56,13 @@ func CanRecv(sock int, frame *CanFrame) int {
 func CanClose(sock int) int {
 	var ret = C.canlib_close(C.int(sock))
 	return int(ret)
+}
+
+func CanPrint(frame *CanFrame) {
+	fmt.Printf("%d\n", frame.CanId)
+	fmt.Printf("%d\n", frame.CanDlc)
+	for i := 0; i < 8; i++ {
+		fmt.Printf("%02x", frame.Data[i])
+	}
+	fmt.Printf("\n")
 }

@@ -1,5 +1,6 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+#include <sys/select.h>
 #include <unistd.h>
 #include <net/if.h>
 #include <linux/if.h>
@@ -47,15 +48,44 @@ int canlib_init(const char *can_dev)
 	return sock;
 }
 
-int canlib_receive(int can_sock, canlib_frame_t *can_frame)
+// @return bytes read, 0 if timeout, < 0 if error
+int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 {
 	struct can_frame frame;
-	// read can data
-	int bytes = read(can_sock, &frame, sizeof(struct can_frame));
+	fd_set readfds;
+	struct timeval timeout;
+	int status;
+	int bytes;
+	FD_ZERO(&readfds);
+	timeout.tv_sec = timeout_ms / 1000;
+	timeout.tv_usec = (timeout_ms % 1000) * 1000;
+
+	FD_SET(can_sock, &readfds);
+	status = select(can_sock + 1, &readfds, NULL, NULL, &timeout);
+	if (status < 0)
+	{
+		// error
+		return status;
+	}
+	if (status == 0)
+	{
+		// timeout
+		return 0;
+	}
+
+	// should be read is available
+	if (!FD_ISSET(can_sock, &readfds))
+	{
+		// error
+		return -1;
+	}
+
+	bytes = read(can_sock, &frame, sizeof(struct can_frame));
 	if (bytes <= 0)
 	{
 		return bytes;
 	}
+
 	// transfer data to canlib_frame_t
 	can_frame->can_dlc = frame.can_dlc;
 	can_frame->can_id = frame.can_id;

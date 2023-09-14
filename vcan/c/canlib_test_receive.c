@@ -8,13 +8,7 @@ int main(int argc, char *argv[])
     int status;
     canlib_frame_t frame;
 
-    if (argc < 2)
-    {
-        printf("Usage: %s <CAN interface>\n", argv[0]);
-        return 1;
-    }
-    printf("%s\n", argv[1]);
-    can_sock = canlib_init(argv[1]);
+    can_sock = canlib_init("vcan0");
     if (can_sock < 0)
     {
         printf("Error initializing CAN interface %d:%s\n", errno, argv[1]);
@@ -23,12 +17,19 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        status = canlib_receive(can_sock, &frame);
+        status = canlib_receive(can_sock, &frame, 20000);
         if (status < 0)
         {
             perror("Error reading CAN frame\n");
             return 1;
         }
+
+        if (status == 0)
+        {
+            printf("Timeout\n");
+            continue;
+        }
+
         printf("%d %04x %04x\n", status, frame.can_id, frame.can_dlc);
         for (int i = 0; i < frame.can_dlc; i++)
         {
