@@ -15,11 +15,11 @@ type deviceState struct {
 	adc_out int32
 }
 
-func bytesToUint16(b []byte) uint16 {
+func BytesToUint16(b []byte) uint16 {
 	return binary.BigEndian.Uint16(b)
 }
 
-func bytesToInt32(b []byte) int32 {
+func BytesToInt32(b []byte) int32 {
 	return int32(binary.BigEndian.Uint32(b))
 }
 
@@ -106,10 +106,10 @@ func main() {
 			switch frame.CanId {
 			case SIM_DIO_IN:
 				// DIO is uint16
-				state.dio_in = bytesToUint16(frame.Data[0:2])
+				state.dio_in = BytesToUint16(frame.Data[0:2])
 			case SIM_DAC_IN:
 				// DAC is int32
-				state.adc_in = bytesToInt32(frame.Data[0:4])
+				state.adc_in = BytesToInt32(frame.Data[0:4])
 			default:
 			}
 		case <-time.After(100 * time.Millisecond):
