@@ -61,3 +61,11 @@ Test programs can_test_receive.c and can_test_send.c exercise the interface.
 ## G
 
 Directory 'g' provides a Go module with functions that use the C libcan.so to interface to a CAN bus inteface. This directory also contains unit tests.
+
+## Device
+
+Directory "device" simulates a CAN bus device with a specified set of inputs and outputs. The client can access the device simulation over the CAN bus.
+
+## Client
+
+Directory "client" provides a Go API accessible by other Go programs to communicate with the 'device'. The client implements the specified set of inputs and outputs that the device provides.

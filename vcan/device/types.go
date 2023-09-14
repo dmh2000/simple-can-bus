@@ -1,4 +1,4 @@
-package sim
+package device
 
 const (
 	SIM_DIO_IN  = 1
@@ -12,3 +12,4 @@ const (
 	SIM_SEND_TIMEOUT = 100
 	SIM_TIMEOUT      = 10000
 )
+
