@@ -4,6 +4,8 @@ all: libcan.so canlib_test_receive canlib_test_send
 
 libcan.so : canlib.c canlib.h
 	$(C) -g -Wall -o libcan.so -shared -fPIC canlib.c
+	sudo cp libcan.so /usr/local/lib
+	sudo ldconfig
 
 canlib_test_receive : canlib_test_receive.c libcan.so
 	$(C) -g -Wall -o canlib_test_receive canlib_test_receive.c -lcan

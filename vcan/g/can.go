@@ -1,13 +1,13 @@
 package can
 
-/*
-#cgo CFLAGS: -g -Wall
-#cgo LDFLAGS: -L./ -lcan
-#include "canlib.h"
-struct canlib_frame;
-*/
+import (
+	"fmt"
+)
+
+//#cgo CFLAGS: -g -Wall -I../c
+//#cgo LDFLAGS: -L. -lcan
+//#include "canlib.h"
 import "C"
-import "fmt"
 
 // note : sizeof canlib_frame is 16 bytes due to padding alignment
 type CanFrame struct {
@@ -32,7 +32,6 @@ func CanSend(sock int, frame *CanFrame) int {
 	for i := 0; i < 8; i++ {
 		cframe.data[i] = C.uchar(frame.Data[i])
 	}
-
 	ret = C.canlib_send(C.int(sock), &cframe)
 	return int(ret)
 }
@@ -65,4 +64,9 @@ func CanPrint(frame *CanFrame) {
 		fmt.Printf("%02x", frame.Data[i])
 	}
 	fmt.Printf("\n")
+}
+
+func CanErrno() int {
+	var errno = C.canlib_status()
+	return int(errno)
 }

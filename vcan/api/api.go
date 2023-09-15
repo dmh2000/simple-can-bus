@@ -8,8 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-
-	"sqirvy.xyz/client"
 )
 
 type CanDevice struct {

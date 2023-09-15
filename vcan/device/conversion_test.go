@@ -1,9 +1,9 @@
-package device_test
+package main_test
 
 import (
 	"testing"
 
-	device "sqirvy.xyz/can-device"
+	device "sqirvy.xyz/device"
 )
 
 func TestBytesToUint16(t *testing.T) {

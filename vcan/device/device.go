@@ -1,4 +1,4 @@
-package device
+package main
 
 import (
 	"encoding/binary"
@@ -6,7 +6,21 @@ import (
 	"time"
 
 	"sqirvy.xyz/can"
+	"sqirvy.xyz/types"
 )
+
+// const (
+// 	SIM_DIO_IN  = 1
+// 	SIM_DIO_OUT = 2
+// 	SIM_DAC_IN  = 3
+// 	SIM_ADC_OUT = 4
+// )
+
+// const (
+// 	SIM_RECV_TIMEOUT = 1000
+// 	SIM_SEND_TIMEOUT = 100
+// 	SIM_TIMEOUT      = 10000
+// )
 
 type deviceState struct {
 	dio_in  uint16
@@ -65,9 +79,10 @@ func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 	var frame can.CanFrame
 	for {
 		// receive with timeout
-		ret := can.CanRecv(sockfd, &frame, SIM_RECV_TIMEOUT)
+		ret := 2
+		ret = can.CanRecv(sockfd, &frame, types.DEVICE_RECV_TIMEOUT)
 		if ret < 0 {
-			fmt.Printf("can.CanRecv() failed: %d\n", ret)
+			fmt.Printf("can.CanRecv() failed: %d %d\n", ret, can.CanErrno())
 			continue
 		}
 		if ret == 0 {
@@ -104,10 +119,10 @@ func main() {
 		case frame := <-fch:
 			// receive from client
 			switch frame.CanId {
-			case SIM_DIO_IN:
+			case types.ID_DIO_IN:
 				// DIO is uint16
 				state.dio_in = BytesToUint16(frame.Data[0:2])
-			case SIM_DAC_IN:
+			case types.ID_DAC_IN:
 				// DAC is int32
 				state.adc_in = BytesToInt32(frame.Data[0:4])
 			default:
@@ -116,13 +131,13 @@ func main() {
 			// update the simulator
 			state.dio_out = state.dio_in
 			state.adc_out = state.adc_in
+
 			// send to client
-			frame16 := uint16Frame(SIM_DIO_OUT, state.dio_out)
+			frame16 := uint16Frame(types.ID_DIO_OUT, state.dio_out)
 			can.CanSend(sockfd, &frame16)
 
-			frame32 := int32Frame(SIM_ADC_OUT, state.adc_out)
+			frame32 := int32Frame(types.ID_ADC_OUT, state.adc_out)
 			can.CanSend(sockfd, &frame32)
-		default:
 		}
 	}
 }

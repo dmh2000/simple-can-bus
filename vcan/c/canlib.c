@@ -12,6 +12,11 @@
 #include <errno.h>
 #include "canlib.h"
 
+int canlib_status(void)
+{
+	return errno;
+}
+
 /**
  * initialize the can bus and the client networks for sending
  */

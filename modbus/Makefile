@@ -1,4 +1,6 @@
 all : 
 	$(MAKE) -C c
-	$(MAKE) -C g
+
+clean:
+	$(MAKE) -C c clean
 

@@ -1,4 +1,4 @@
-package client
+package main
 
 // "../g/sqirvy.xyz/can"
 
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"sqirvy.xyz/can"
+	"sqirvy.xyz/types"
 )
 
 type CanData struct {
@@ -93,7 +94,7 @@ func receiver(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 	var frame can.CanFrame
 	for {
 		// receive with timeout
-		ret := can.CanRecv(sockfd, &frame, CLIENT_RECV_TIMEOUT)
+		ret := can.CanRecv(sockfd, &frame, types.CLIENT_RECV_TIMEOUT)
 		if ret < 0 {
 			fmt.Printf("can.CanRecv() failed: %d\n", ret)
 			continue
@@ -132,7 +133,7 @@ func main() {
 
 	for {
 		// receive with timeout
-		ret := can.CanRecv(sockfd, &frame, CLIENT_RECV_TIMEOUT)
+		ret := can.CanRecv(sockfd, &frame, types.CLIENT_RECV_TIMEOUT)
 		if ret < 0 {
 			fmt.Printf("can.CanRecv() failed: %d\n", ret)
 			continue
@@ -143,10 +144,10 @@ func main() {
 		}
 
 		switch frame.CanId {
-		case CLIENT_DIO_OUT:
+		case types.ID_DIO_OUT:
 			v := uint16(bytesToUint16(frame.Data[:]))
 			simState.dio_out.Store(v)
-		case CLIENT_ADC_OUT:
+		case types.ID_ADC_OUT:
 			v := int32(bytesToInt32(frame.Data[:]))
 			simState.adc_out.Store(v)
 		default:
@@ -162,10 +163,10 @@ func PutCanUint16(id int, v uint16) error {
 	var err error
 	var frame can.CanFrame
 	switch id {
-	case CLIENT_DIO_IN:
+	case types.ID_DIO_IN:
 		clientState.putDioIn(v)
 		// send to CAN bus
-		frame.CanId = CLIENT_DIO_IN
+		frame.CanId = types.ID_DIO_IN
 		frame.CanDlc = 2
 		b := uint16ToBytes(v)
 		copy(frame.Data[:], b)
@@ -183,11 +184,11 @@ func PutCanInt32(id int, v int32) error {
 	var err error
 	var frame can.CanFrame
 	switch id {
-	case CLIENT_DAC_IN:
+	case types.ID_DAC_IN:
 		clientState.putDacIn(v)
 		// send to CAN bus
-		frame.CanId = CLIENT_DIO_IN
-		frame.CanDlc = 2
+		frame.CanId = types.ID_DAC_IN
+		frame.CanDlc = 4
 		b := int32ToBytes(v)
 		copy(frame.Data[:], b)
 		can.CanSend(sockfd, &frame)
@@ -204,7 +205,7 @@ func GetCanUint16(id int) (uint16, error) {
 	var v uint16
 	var err error
 	switch id {
-	case CLIENT_DIO_OUT:
+	case types.ID_DIO_OUT:
 		v = clientState.getDioOut()
 		err = nil
 	default:
@@ -219,7 +220,7 @@ func GetCanInt32(id int) (int32, error) {
 	var err error
 
 	switch id {
-	case CLIENT_ADC_OUT:
+	case types.ID_ADC_OUT:
 		v = clientState.getAdcOut()
 		err = nil
 	default:
