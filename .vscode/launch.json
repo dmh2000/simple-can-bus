@@ -12,6 +12,13 @@
       "program": "${workspaceFolder}/vcan/g"
     },
     {
+      "name": "API",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/vcan/api"
+    },
+    {
       "name": "Sim",
       "type": "go",
       "request": "launch",

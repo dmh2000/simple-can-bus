@@ -21,7 +21,7 @@ dkms.conf
 *.exp
 # Fortran module files
 *.gch
-go.work
+# go.work
 # Go workspace file
 *.hex
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
