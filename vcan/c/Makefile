@@ -1,9 +1,10 @@
-C=clang
-
 all: libcan.so canlib_test_receive canlib_test_send
 
 libcan.so : canlib.c canlib.h
 	$(C) -g -Wall -o libcan.so -shared -fPIC canlib.c
+	@echo "------------------------------------------------------"
+	@echo "Installing libcan.so to /usr/local/lib, requires sudo"
+	@echo "------------------------------------------------------"
 	sudo cp libcan.so /usr/local/lib
 	sudo ldconfig
 

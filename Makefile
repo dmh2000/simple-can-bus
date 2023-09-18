@@ -1,7 +1,9 @@
+export C=gcc
+
 all: 
-	$(MAKE) -C vcan
-	$(MAKE) -C modbus
+	@$(MAKE) -C vcan
+	# @$(MAKE) -C modbus
 
 clean:
-	$(MAKE) -C vcan clean
-	$(MAKE) -C modbus clean
+	@$(MAKE) -C vcan clean
+	# @$(MAKE) -C modbus clean
