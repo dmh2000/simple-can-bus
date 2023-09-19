@@ -28,6 +28,7 @@ var device = CanDevice{DioIn: 0, DioOut: 0, DacIn: 0, AdcOut: 0}
 
 // set the dio input commands
 func DioIn(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var d CanDevice
 	reqBody, _ := io.ReadAll(r.Body)
 	err := json.Unmarshal(reqBody, &d)
@@ -43,6 +44,7 @@ func DioIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func DacIn(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var d CanDevice
 	reqBody, _ := io.ReadAll(r.Body)
 	err := json.Unmarshal(reqBody, &d)
@@ -59,14 +61,18 @@ func DacIn(w http.ResponseWriter, r *http.Request) {
 
 // get the current dio outputs
 func DeviceOut(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	jsondata, err := json.Marshal(device)
-	fmt.Printf("jsondata: %s\n", jsondata)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	w.Header().Set("status", "200")
-	fmt.Fprint(w, device)
+	s := string(jsondata)
+	fmt.Fprint(w, s)
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func main() {
