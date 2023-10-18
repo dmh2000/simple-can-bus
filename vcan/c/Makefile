@@ -1,6 +1,11 @@
+export C=gcc
+
 all: libcan.so canlib_test_receive canlib_test_send
 
 libcan.so : canlib.c canlib.h
+	@echo "------------------------------------------------------"
+	@echo Building libcan.so
+	@echo "------------------------------------------------------"	
 	$(C) -g -Wall -o libcan.so -shared -fPIC canlib.c
 	@echo "------------------------------------------------------"
 	@echo "Installing libcan.so to /usr/local/lib, requires sudo"
