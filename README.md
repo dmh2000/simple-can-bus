@@ -1,15 +1,23 @@
 # SQIRVY
 
 This project is a collection of programs that implement a simulation of a set of devices. It includes a CAN bus simulation app.
-(a modbus sim is in development)
+
+## References
+
+The primary sources I used for figuring out CAN and vcan.
+
+https://github.com/linux-can/can-utils
+https://docs.kernel.org/networking/can.html
+https://elinux.org/CAN_Bus
+https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
+
+## CAN BUS SIMULATION
 
 The architecture looks something like this:
 
 <img src="./sqirvy.drawio.svg"/>
 
-## CAN BUS SIMULATION
-
-The CAN bus simulator uses the Linux 'vcan' support, along with a simple 'device' that is accessible over the CAN bus. Itlistens for CAN frames from a controller and responds with data.
+The CAN bus simulator uses the Linux 'vcan' support, along with a simple 'device' that is accessible over the CAN bus. It listens for CAN frames from a controller and responds with data.
 There is a controller that consists of a web app front end, through an API endpoint that connects to the can bus and forwards commands and returns response data from the 'device'.
 
 The CAN bus messages include:
@@ -37,6 +45,7 @@ The CAN bus messages include:
 ### Activating the VCAN IP device
 
 - https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
+- If the modprobe fails to find vcan, then your kernel probably doesn't have CAN support built in so you would have to build a kernel. That's not trivial but its dooable.
 
 ```bash
     #!/bin/bash
@@ -47,6 +56,53 @@ The CAN bus messages include:
     # Bring the virtual CAN interface online.
     sudo ip link set up vcan0
 ```
+
+### can-utils
+
+https://github.com/linux-can/can-utils
+
+The standard package 'can-utils' includes a bunch of utilities for working with CAN bus on Linux. Using candump or cansend is a good way to test the complement functions in the c or go versions.
+
+```bash
+
+# INSTALL
+sudo apt install can-utils
+
+# TEST
+# terminal 1
+candump -tz vcan0
+
+# terminal 2
+cansend vcan0 123#00FFAA5501020304
+```
+
+## Directory 'vcan' : CAN bus access with C and/or Go
+
+### C
+
+Directory 'c' contains a set of stripped down functions that can be used to send and receive data from a CAN bus interface. The code here has the more complicated incantations to connect to a CAN device using the socket interface. This is based on excerpts from the can-utils source.
+
+The makefiles build libcan.so and attempt to install it in /usr/local/lib
+
+Test programs can_test_receive.c and can_test_send.c exercise the interface.
+
+### G
+
+Directory 'g' provides a Go module with functions that use the C libcan.so to interface to a CAN bus inteface. This directory also contains unit tests. The code here intends to be a very simple wrapper over the C library. This provides basic CAN send/receive support for Go. A real CAN device may have more functionality like error handling and filtering incoming messages. That's left to the reader.
+
+### Device
+
+Directory "device" simulates a CAN bus device with a specified set of inputs and outputs. The client can access the device simulation over the CAN bus.
+
+### Client
+
+Directory "client" provides a Go API accessible by other Go programs to communicate with the 'device'. The client implements the specified set of inputs and outputs that the device provides.
+
+### API
+
+Directory "api" contains a web backend that connects to the CAN simulated device. It provides send/receive functions for a web application that displays and controls the CAN simulation.
+
+### can-ui
 
 ### Build
 
@@ -74,8 +130,6 @@ Note on make process :
   - a Go program source and executable 'device', that acts as a very simple simulated CAN device.
   - it has two inputs, a DIO input and a DAC.
   - it has two ouputs, a DIO output and an ADC.
-
-  MOVE CLIENT to API!!!!!
 
 - **vcan/client**
   - a Go program that is the interface between the CAN bus and the REST api.

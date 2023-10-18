@@ -1,5 +1,3 @@
-export C=gcc
-
 all: 
 	@$(MAKE) -C vcan
 
