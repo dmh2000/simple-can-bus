@@ -1,6 +1,6 @@
 test: 
 	@echo "------------------------------------------------------"
-	@echo Testing can.go (go wrapper over canlib.so)
+	@echo Testing can.go -go wrapper over canlib.so
 	@echo "------------------------------------------------------"	
 	go test can_test.go
 
