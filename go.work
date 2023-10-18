@@ -1,9 +1,9 @@
 go 1.21.0
 
 use (
-	./vcan/g
-	./vcan/device
-	./vcan/client
-	./vcan/api
-	./vcan/types
+	./g
+	./device
+	./client
+	./api
+	./types
 )

@@ -104,6 +104,8 @@ Directory "api" contains a web backend that connects to the CAN simulated device
 
 ### can-ui
 
+A web client for accessing the CAN bus data. Its a React/Vite app.
+
 ### Build
 
 This projects uses simple make instructions to build the components.
@@ -118,13 +120,17 @@ The build process creates 4 executables, 1 Go support module and 1 shared librar
 Note on make process :
 
 - **vcan/c/libcan.so** : a C library that performs the low level access to the local can bus. In this case to the linux 'vcan' simulator.
+
   - the source files are in ./vcan/c
   - The build process also installs the updated library in /usr/local/lib. The process will ask for 'sudo' privileges.
   - this directory includes some simple tests that can be used with the can-utils package such as candump and cansend.
   - this library uses the IP model for the CAN bus
+
 - **vcan/g/can.go**
+
   - a Go module that implements a bridge between the 'c' libcan.so and the Go programs.
-  - it provides a simple Go api that higher level apps can use. The intent was to minimize the network details for sending and receiving CAN daa.
+  - it provides a simple Go api that higher level apps can use. The intent was to minimize the network details for sending and receiving CAN data.
+
 - **vcan/device/**
 
   - a Go program source and executable 'device', that acts as a very simple simulated CAN device.
@@ -132,8 +138,10 @@ Note on make process :
   - it has two ouputs, a DIO output and an ADC.
 
 - **vcan/client**
+
   - a Go program that is the interface between the CAN bus and the REST api.
   - it provides functions to send app specific CAN messages and an active listener to data update.
+
 - **vcan/api**
   - a Go program source that exposes a REST api accessible by any web application.
   - it exposes 3 urls:
