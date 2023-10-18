@@ -1,11 +1,23 @@
 # SQIRVY
 
-This project is a collection of programs that implement a simulation of a set of devices. It includes a CAN bus simulation app.
-(a modbus sim is in development)
+This project is a collection of Go programs that implement a simulation of a CAN device. It includes a CAN bus simulation app.
 
 The architecture looks something like this:
 
 <img src="./sqirvy.drawio.svg"/>
+
+## TLDR
+
+If you have a Linux system and you want to use CAN bus with Go, take a look in directory vcan/g. This module provides a simplified Go API for sending and receiving on a CAN bus. It uses the C library generated in vcan/c. These two directories are what you need to do basic CAN bus in the simplest way possible.
+
+To see an example of a very simple full featured application, start in the next section.
+
+### References
+
+- https://github.com/linux-can/can-utils
+- https://docs.kernel.org/networking/can.html
+- https://elinux.org/CAN_Bus
+- https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
 
 ## CAN BUS SIMULATION
 
