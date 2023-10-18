@@ -15,7 +15,7 @@ https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-
 
 The architecture looks something like this:
 
-<img src="./sqirvy.drawio.svg"/>
+<img src="./sqirvy.drawio.png"/>
 
 The CAN bus simulator uses the Linux 'vcan' support, along with a simple 'device' that is accessible over the CAN bus. It listens for CAN frames from a controller and responds with data.
 There is a controller that consists of a web app front end, through an API endpoint that connects to the can bus and forwards commands and returns response data from the 'device'.
