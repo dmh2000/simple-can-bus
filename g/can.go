@@ -5,7 +5,7 @@ import (
 )
 
 //#cgo CFLAGS: -g -Wall -I../c
-//#cgo LDFLAGS: -L. -lcan
+//#cgo LDFLAGS: -L${SRCDIR}/../c -lcan
 //#include "canlib.h"
 import "C"
 

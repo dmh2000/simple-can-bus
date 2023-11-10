@@ -1,6 +1,6 @@
-# SQIRVY
+# SIMPLE CAN BUS WITH GO
 
-This project is a collection of programs that implement a simulation of a set of devices. It includes a CAN bus simulation app.
+This project is a collection of Go and C libraries and programs that set up a very simple simulation of a set of devices. It might be useful for someone experimenting with CAN bus with Go for the first time.
 
 ## References
 
@@ -15,10 +15,31 @@ https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-
 
 The architecture looks something like this:
 
-<img src="./sqirvy.drawio.png"/>
+<img src="./simple-can-bus.png"/>
 
-The CAN bus simulator uses the Linux 'vcan' support, along with a simple 'device' that is accessible over the CAN bus. It listens for CAN frames from a controller and responds with data.
-There is a controller that consists of a web app front end, through an API endpoint that connects to the can bus and forwards commands and returns response data from the 'device'.
+Starting at the bottom right of the diagram and going counter-clockwise:
+
+- Device Simulator : simple simulated device accessible over CAN
+
+  - vcan : the standard vcan module
+  - libcan.so : C library that performs the setup and connections to the CAN bus interface. The low level incantations to access the CAN bus interface is easier to do in C.
+    - in directory "c"
+  - can.go : a Go package that uses libcan.so and exposes a Go interface to the CAN bus
+    - in directory "g"
+  - device : executable device simulator
+    - in directory "device"
+
+- CAN bus 'client' : executable that exposes a run time interface to the simulated device.
+
+  - uses vcan, c/libcan.so and g/can.go
+  - client : a client side executable program that sends and receives CAN bus messages to and from the device simulator. It exposes a Go interface that allows other apps to send and receive CAN bus messages.
+    - in directory "client"
+  - api : a Go web API that talks to the 'client' and lets remote programs read and update the state of the CAN bus simulator
+    - in directory "api"
+
+- Remote user interface
+  - can-ui : a React app that uses the 'api' to provide a user interface to access the CAN bus simuilator
+    - in directory "can-ui"
 
 The CAN bus messages include:
 
@@ -29,13 +50,14 @@ The CAN bus messages include:
 
 ### How To Run
 
-- Install vcan support on Linux if its not already there. I used Ubuntu 20 which has the support. The instructions here are for debian based systems.
+- Install the Linux package 'can-utils. Command line tools that can be used to send and receive CAN messages. Its useful in testing.
+- Vcan (Virtual CAN Bus) is a kernel module that creates a virtual CAN bus interface on jthe LINUX system. Install the vcan module on Linux if its not already there. I used Ubuntu 20 which has the support. The instructions here are for debian based systems.
 - Install build-essential, golang (18 or later) and nodejs.
 - Activate the VCAN module for use as a network device (see below)
-- Clone this repo at https://github.com/dmh2000/sqirvy (pronounced 'scurvy')
+- Clone this repo at https://github.com/dmh2000/simple-can-bus
 - cd into top level
 - execute 'make'
-  - the make process will install a new shared library into /usr/local/lib. The makefile will ask for 'sudo' privileges.
+  - the make process is set up to use the local instance of c/libcan.so using LD_LIBRARY_PATH where needed. If you want to make it permanent you can install c/libcan.so into /usr/local/lib. See c/Makefile and uncomment the lines that install that library.
 - in a terminal, run the vcan/device/device program
 - in a terminal, run the vcan/api/api program
 - in a terminal, run the vcan/client/client program
