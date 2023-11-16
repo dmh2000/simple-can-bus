@@ -50,10 +50,8 @@ The CAN bus messages include:
 
 ### How To Run
 
-- Install the Linux package 'can-utils. Command line tools that can be used to send and receive CAN messages. Its useful in testing.
-- Vcan (Virtual CAN Bus) is a kernel module that creates a virtual CAN bus interface on jthe LINUX system. Install the vcan module on Linux if its not already there. I used Ubuntu 20 which has the support. The instructions here are for debian based systems.
-- Install build-essential, golang (18 or later) and nodejs.
-- Activate the VCAN module for use as a network device (see below)
+These setup instructions are targeted at Debian based systems.
+
 - Clone this repo at https://github.com/dmh2000/simple-can-bus
 - cd into top level
 - execute 'make'
@@ -64,7 +62,13 @@ The CAN bus messages include:
 - in a terminal, start the vcan/can-ui web client
   - this requires some node setup. See below for details.
 
-### Activating the VCAN IP device
+### Step 1 : Clone this repo
+
+- git clone https://github.com/dmh2000/simple-can-bus
+
+### Step 1 : Activating the VCAN IP device
+
+For this application to work, your Linux kernel needs to have the VCAN module built in.
 
 - https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
 - If the modprobe fails to find vcan, then your kernel probably doesn't have CAN support built in so you would have to build a kernel. That's not trivial but its dooable.
@@ -79,7 +83,13 @@ The CAN bus messages include:
     sudo ip link set up vcan0
 ```
 
-### can-utils
+### Step 2 : Install dev tools
+
+- sudo apt install build-essential
+- install golang 1.18 or later : https://go.dev/dl/
+- install node.js 18 or later : https://nodejs.org/en/download/current
+
+### Step 3 : Install the can-utils package
 
 https://github.com/linux-can/can-utils
 
@@ -98,35 +108,43 @@ candump -tz vcan0
 cansend vcan0 123#00FFAA5501020304
 ```
 
-## Directory 'vcan' : CAN bus access with C and/or Go
+### Step 4 : Build the project
 
-### C
+From the top level, execute 'make'
+$ make
 
-Directory 'c' contains a set of stripped down functions that can be used to send and receive data from a CAN bus interface. The code here has the more complicated incantations to connect to a CAN device using the socket interface. This is based on excerpts from the can-utils source.
+This will recursively build in the following directories. The second step in the Makefile, " make g test" will take a few seconds to execute. If your system does not have the vcan module installed, this step will fail.
+
+#
+
+- ./c
+
+  - builds 'libcan.so'
+  - this libary contains a set of stripped down functions that can be used to send and receive data from a CAN bus interface. The code here has the more complicated incantations to connect to a CAN device using the socket interface. This is based on excerpts from the can-utils source.
 
 The makefiles build libcan.so and attempt to install it in /usr/local/lib
 
 Test programs can_test_receive.c and can_test_send.c exercise the interface.
 
-### G
+- ./g
 
 Directory 'g' provides a Go module with functions that use the C libcan.so to interface to a CAN bus inteface. This directory also contains unit tests. The code here intends to be a very simple wrapper over the C library. This provides basic CAN send/receive support for Go. A real CAN device may have more functionality like error handling and filtering incoming messages. That's left to the reader.
 
-### Device
+- ./device
 
 Directory "device" simulates a CAN bus device with a specified set of inputs and outputs. The client can access the device simulation over the CAN bus.
 
-### Client
+- ./client
 
 Directory "client" provides a Go API accessible by other Go programs to communicate with the 'device'. The client implements the specified set of inputs and outputs that the device provides.
 
-### API
+- ./api
 
 Directory "api" contains a web backend that connects to the CAN simulated device. It provides send/receive functions for a web application that displays and controls the CAN simulation.
 
 ### can-ui
 
-A web client for accessing the CAN bus data. Its a React/Vite app.
+A web client for accessing the CAN bus data. Its a Node/React/Vite app. This directory is not included in the make sequence. Instructions for running are covered below.
 
 ### Build
 
