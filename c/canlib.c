@@ -12,9 +12,9 @@
 #include <errno.h>
 #include "canlib.h"
 
-int canlib_status(void)
+uint32_t canlib_status(void)
 {
-	return errno;
+	return (uint32_t)errno;
 }
 
 /**

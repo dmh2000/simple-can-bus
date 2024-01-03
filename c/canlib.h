@@ -23,6 +23,6 @@ int canlib_receive(int can_sock, canlib_frame_t *frame, int timeout_ms);
 // @return bytes written, < 0 if error
 int canlib_send(int can_sock, canlib_frame_t *frame);
 int canlib_close(int can_sock);
-int canlib_status(void);
+uint32_t canlib_status(void);
 
 #endif // VCANLIB_H__

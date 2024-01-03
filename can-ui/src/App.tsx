@@ -4,76 +4,89 @@ import axios from "axios";
 import "./App.css";
 
 interface CanDevice {
-  DioIn: number;
+  DioSet: number;
   DioOut: number;
-  DacIn: number;
+  DacSet: number;
   AdcOut: number;
 }
 
 function App() {
   const [canDevice, setCanDevice] = useState<CanDevice>({
-    DioIn: 0,
+    DioSet: 0,
     DioOut: 0,
-    DacIn: 0,
+    DacSet: 0,
     AdcOut: 0,
   });
 
-  const [dio, setDio] = useState<number>(0);
+  const [Dio, setDio] = useState<number>(0);
   const [updateDio, setUpdateDio] = useState<boolean>(false); // [dio, setDio] = useState<number>(0);
-  const [dac, setDac] = useState<number>(0);
+  const [Dac, setDac] = useState<number>(0);
   const [updateDac, setUpdateDac] = useState<boolean>(false); // [dac, setDac] = useState<number>(0);
   const [update, setUpdate] = useState<boolean>(false);
 
   const headers = {
     "Content-Type": "application/json",
   };
-  useEffect(() => {
-    axios({
-      // Endpoint to send files
-      url: "http://localhost:6001/can/3",
-      method: "GET",
-      headers: headers,
-    })
-      .then((response) => {
-        console.log("response", response.data);
-        return response.data;
-      })
-      .then((data) => {
-        console.log("data", data);
-        setCanDevice(data);
-      })
-      .catch((error) => {
-        console.log("error", error);
-      });
-  }, [update]);
 
+  // update at 1 hz
+  useEffect(() => {
+    const interval = setInterval(() => {
+      axios({
+        // Endpoint to send files
+        url: "http://localhost:6001/can/3",
+        method: "GET",
+        headers: headers,
+      })
+        .then((response) => {
+          console.log("get", response.data);
+          return response.data;
+        })
+        .then((data) => {
+          console.log("data", data);
+          setCanDevice(data);
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // update when changed
   useEffect(() => {
     axios
-      .put("http://localhost:6001/can/1", { dio }, { headers })
+      .put("http://localhost:6001/can/1", { Dio: Dio }, { headers })
       .then((response) => {
-        console.log("response", response.data);
+        console.log("put", response.data);
         return response.data;
       })
       .catch((error) => {
         console.log("error", error);
       });
+    let data: CanDevice = canDevice;
+    data.DioSet = Dio;
+    setCanDevice(data);
   }, [updateDio]);
 
+  // update when changed
   useEffect(() => {
     axios
-      .put("http://localhost:6001/can/2", { dac }, { headers })
+      .put("http://localhost:6001/can/2", { Dac: Dac }, { headers })
       .then((response) => {
-        console.log("response", response.data);
+        console.log("put", response.data);
         return response.data;
       })
       .catch((error) => {
         console.log("error", error);
       });
+    let data: CanDevice = canDevice;
+    data.DacSet = Dac;
+    setCanDevice(data);
   }, [updateDac]);
 
   const onSubmit = (event: any) => {
     event.preventDefault();
-    console.log("onSubmit", dio, dac);
+    console.log("onSubmit", Dio, Dac);
     setUpdate(!update);
     setUpdateDio(!updateDio);
     setUpdateDac(!updateDac);
@@ -92,13 +105,13 @@ function App() {
   return (
     <div className="App">
       <div className="aleft">
-        <span className="hdg">Dio In</span> <span>{canDevice.DioIn} </span>
+        <span className="hdg">Dio Set</span> <span>{canDevice.DioSet} </span>
       </div>
       <div className="aleft">
         <span className="hdg">Dio Out</span> <span> {canDevice.DioOut}</span>
       </div>
       <div className="aleft">
-        <span className="hdg">Dac In</span> <span> {canDevice.DacIn}</span>
+        <span className="hdg">Dac Set</span> <span> {canDevice.DacSet}</span>
       </div>
       <div className="aleft">
         <span className="hdg">Adc Out</span> <span> {canDevice.AdcOut}</span>
@@ -109,7 +122,7 @@ function App() {
         <div>
           <input
             type="number"
-            value={dio}
+            value={Dio}
             onChange={onDioChange}
             min={0}
             max={65535}
@@ -118,7 +131,7 @@ function App() {
         <div>
           <input
             type="number"
-            value={dac}
+            value={Dac}
             onChange={onDacChange}
             min={0}
             max={10000}

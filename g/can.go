@@ -2,6 +2,7 @@ package can
 
 import (
 	"fmt"
+	"syscall"
 )
 
 //#cgo CFLAGS: -g -Wall -I../c
@@ -39,10 +40,15 @@ func CanSend(sock int, frame *CanFrame) int {
 // CanRecv receives a frame from the socket, blocking
 func CanRecv(sock int, frame *CanFrame, timeout int) int {
 	var ret C.int
+	// var errno _Ctype_uint
 	var cframe C.struct_canlib_frame
 	ret = C.canlib_receive(C.int(sock), &cframe, C.int(timeout))
 	frame.CanId = uint32(cframe.can_id)
 	frame.CanDlc = byte(cframe.can_dlc)
+
+	if ret < 0 {
+		return int(ret)
+	}
 
 	// always copy 8 bytes
 	for i := 0; i < 8; i++ {
@@ -69,4 +75,33 @@ func CanPrint(frame *CanFrame) {
 func CanErrno() int {
 	var errno = C.canlib_status()
 	return int(errno)
+}
+
+func CanErrnoString() string {
+	var errno = C.canlib_status()
+	return syscall.Errno(errno).Error()
+}
+
+func Uint16Frame(id uint32, v uint16) CanFrame {
+	frame := CanFrame{}
+	frame.CanId = id
+	frame.CanDlc = 2
+	b := Uint16ToBytes(v)
+	frame.Data[0] = b[0]
+	frame.Data[1] = b[1]
+
+	return frame
+}
+
+func Int32Frame(id uint32, v int32) CanFrame {
+	frame := CanFrame{}
+	frame.CanId = id
+	frame.CanDlc = 4
+	b := Int32ToBytes(v)
+	frame.Data[0] = b[0]
+	frame.Data[1] = b[1]
+	frame.Data[2] = b[2]
+	frame.Data[3] = b[3]
+
+	return frame
 }

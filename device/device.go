@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"sqirvy.xyz/can"
@@ -16,48 +16,12 @@ type deviceState struct {
 	adc_out int32
 }
 
-func BytesToUint16(b []byte) uint16 {
-	return binary.BigEndian.Uint16(b)
-}
+type CANFrame struct {
+	adc_in atomic.Value
+	dio_in atomic.Value
 
-func BytesToInt32(b []byte) int32 {
-	return int32(binary.BigEndian.Uint32(b))
-}
-
-func Uint16ToBytes(v uint16) []byte {
-	b := make([]byte, 2)
-	binary.BigEndian.PutUint16(b, v)
-	return b
-}
-
-func Int32ToBytes(v int32) []byte {
-	b := make([]byte, 4)
-	binary.BigEndian.PutUint32(b, uint32(v))
-	return b
-}
-
-func uint16Frame(id uint32, v uint16) can.CanFrame {
-	frame := can.CanFrame{}
-	frame.CanId = id
-	frame.CanDlc = 2
-	b := Uint16ToBytes(v)
-	frame.Data[0] = b[0]
-	frame.Data[1] = b[1]
-
-	return frame
-}
-
-func int32Frame(id uint32, v int32) can.CanFrame {
-	frame := can.CanFrame{}
-	frame.CanId = id
-	frame.CanDlc = 4
-	b := Int32ToBytes(v)
-	frame.Data[0] = b[0]
-	frame.Data[1] = b[1]
-	frame.Data[2] = b[2]
-	frame.Data[3] = b[3]
-
-	return frame
+	dio_out atomic.Value
+	adc_out atomic.Value
 }
 
 // the can bus recv function is blocking so run it
@@ -69,11 +33,11 @@ func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 		ret := 2
 		ret = can.CanRecv(sockfd, &frame, types.DEVICE_RECV_TIMEOUT)
 		if ret < 0 {
-			fmt.Printf("can.CanRecv() failed: %d %d\n", ret, can.CanErrno())
+			fmt.Printf("can.CanRecv() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
 			continue
 		}
 		if ret == 0 {
-			fmt.Printf("can.CanRecv() timeout: %d\n", ret)
+			// fmt.Printf("can.CanRecv() timeout: %d\n", ret)
 			continue
 		}
 		select {
@@ -100,30 +64,43 @@ func main() {
 
 	go recvDevice(sockfd, fch, quit)
 
+	prev_dio_out := uint16(0)
+	prev_adc_out := int32(0)
+
 	q := false
 	for q == false {
 		select {
 		case frame := <-fch:
 			// receive from client
 			switch frame.CanId {
-			case types.ID_DIO_IN:
+			case types.ID_DIO_SET:
 				// DIO is uint16
-				state.dio_in = BytesToUint16(frame.Data[0:2])
-			case types.ID_DAC_IN:
+				state.dio_in = can.BytesToUint16(frame.Data[0:2])
+				print("DIO SET: ", state.dio_in, "\n")
+			case types.ID_DAC_SET:
 				// DAC is int32
-				state.adc_in = BytesToInt32(frame.Data[0:4])
+				state.adc_in = can.BytesToInt32(frame.Data[0:4])
+				print("ADC SET: ", state.adc_in, "\n")
 			default:
 			}
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(1000 * time.Millisecond):
 			// update the simulator
 			state.dio_out = state.dio_in
 			state.adc_out = state.adc_in
 
 			// send to client
-			frame16 := uint16Frame(types.ID_DIO_OUT, state.dio_out)
+			if state.dio_out != prev_dio_out {
+				print("DIO OUT: ", state.dio_out, "\n")
+				prev_dio_out = state.dio_out
+			}
+			frame16 := can.Uint16Frame(types.ID_DIO_OUT, state.dio_out)
 			can.CanSend(sockfd, &frame16)
 
-			frame32 := int32Frame(types.ID_ADC_OUT, state.adc_out)
+			if state.adc_out != prev_adc_out {
+				print("ADC OUT: ", state.adc_out, "\n")
+				prev_adc_out = state.adc_out
+			}
+			frame32 := can.Int32Frame(types.ID_ADC_OUT, state.adc_out)
 			can.CanSend(sockfd, &frame32)
 		}
 	}

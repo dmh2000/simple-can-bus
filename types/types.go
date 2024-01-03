@@ -1,9 +1,9 @@
 package types
 
 const (
-	ID_DIO_IN  = 1
+	ID_DIO_SET = 1
 	ID_DIO_OUT = 2
-	ID_DAC_IN  = 3
+	ID_DAC_SET = 3
 	ID_ADC_OUT = 4
 )
 

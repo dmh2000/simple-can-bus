@@ -5,32 +5,46 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch file",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${file}"
+    },
+    {
       "name": "can-ui",
       "request": "launch",
       "type": "chrome",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/vcan/can-ui"
+      "webRoot": "${workspaceFolder}/can-ui"
     },
     {
       "name": "Launch Package",
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/vcan/g"
+      "program": "${workspaceFolder}/g"
     },
     {
       "name": "API",
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/vcan/api"
+      "program": "${workspaceFolder}/api"
     },
     {
-      "name": "Sim",
+      "name": "device",
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/vcan/sim"
+      "program": "${workspaceFolder}/device/device.go"
+    },
+    {
+      "name": "client",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/client/client.go"
     },
     {
       "name": "receiver",
