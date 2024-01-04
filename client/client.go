@@ -90,11 +90,6 @@ func Run() {
 
 	canState.init(sockfd)
 
-	fch := make(chan can.CanFrame)
-	defer close(fch)
-	quit := make(chan bool)
-	defer close(quit)
-
 	for {
 		// receive with timeout
 		ret, err := can.CanRecv(sockfd, &frame, types.CLIENT_RECV_TIMEOUT)

@@ -73,6 +73,7 @@ func DacSet(w http.ResponseWriter, r *http.Request) {
 		log.Printf("DacSet error: %s\n", reqBody)
 		return
 	}
+	// update the device
 	device.DacSet = v
 	log.Printf("Dac Set: %d\n", v)
 	// forward to the CAN bus
