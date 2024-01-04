@@ -34,7 +34,6 @@ func TestCanClose(t *testing.T) {
 // use candump vcan0 in another terminal to see the frames
 func TestCanSend(t *testing.T) {
 	var sock int
-	var ret int
 	sock = CanInit("vcan0")
 	if sock < 0 {
 		t.Error("CanInit failed")
@@ -47,14 +46,14 @@ func TestCanSend(t *testing.T) {
 		frame.Data[i] = byte(i)
 	}
 
-	ret = CanSend(sock, &frame)
-	if ret < 0 {
+	ret, err := CanSend(sock, &frame)
+	if ret < 0 || err != nil {
 		t.Error("CanSend failed")
 	}
 
 	frame.CanDlc = 4
-	ret = CanSend(sock, &frame)
-	if ret < 0 {
+	ret, err = CanSend(sock, &frame)
+	if ret < 0 || err != nil {
 		t.Error("CanSend failed")
 	}
 
@@ -68,7 +67,6 @@ func TestCanReceive1(t *testing.T) {
 
 	var send = func(wg *sync.WaitGroup) {
 		var sock int
-		var ret int
 		sock = CanInit("vcan0")
 		if sock < 0 {
 			t.Error("CanInit failed")
@@ -81,9 +79,9 @@ func TestCanReceive1(t *testing.T) {
 			frame.Data[i] = byte(i)
 		}
 
-		ret = CanSend(sock, &frame)
+		ret, err := CanSend(sock, &frame)
 		t.Log("sent frame")
-		if ret < 0 {
+		if ret < 0 || err != nil {
 			t.Error("CanSend failed")
 		}
 
@@ -94,7 +92,6 @@ func TestCanReceive1(t *testing.T) {
 
 	var recv = func(wg *sync.WaitGroup) {
 		var sock int
-		var ret int
 		sock = CanInit("vcan0")
 		if sock < 0 {
 			t.Error("CanInit failed")
@@ -103,9 +100,9 @@ func TestCanReceive1(t *testing.T) {
 		var frame CanFrame
 
 		// run cansend vcan0 in another terminal to see the frame
-		ret = CanRecv(sock, &frame, 10000)
+		ret, err := CanRecv(sock, &frame, 10000)
 		t.Log("received frame or timeout")
-		if ret < 0 {
+		if ret < 0 || err != nil {
 			t.Error("CanSend failed")
 		}
 
@@ -114,7 +111,7 @@ func TestCanReceive1(t *testing.T) {
 		}
 
 		if ret != 16 {
-			t.Error(fmt.Printf("CanRecv did not receive 16 bytes %d", ret))
+			t.Error(fmt.Sprintf("CanRecv did not receive 16 bytes %d", ret))
 		}
 
 		if frame.CanId != 99 {
@@ -154,7 +151,6 @@ func TestCanReceive2(t *testing.T) {
 
 	var send = func(wg *sync.WaitGroup) {
 		var sock int
-		var ret int
 		sock = CanInit("vcan0")
 		if sock < 0 {
 			t.Error("CanInit failed")
@@ -167,8 +163,8 @@ func TestCanReceive2(t *testing.T) {
 			frame.Data[i] = byte(i)
 		}
 
-		ret = CanSend(sock, &frame)
-		if ret < 0 {
+		ret, err := CanSend(sock, &frame)
+		if ret < 0 || err != nil {
 			t.Error("CanSend failed")
 		}
 		t.Log("sent frame")
@@ -180,7 +176,6 @@ func TestCanReceive2(t *testing.T) {
 
 	var recv = func(wg *sync.WaitGroup) {
 		var sock int
-		var ret int
 		sock = CanInit("vcan0")
 		if sock < 0 {
 			t.Error("CanInit failed")
@@ -188,9 +183,9 @@ func TestCanReceive2(t *testing.T) {
 
 		var frame CanFrame
 
-		ret = CanRecv(sock, &frame, 10000)
+		ret, err := CanRecv(sock, &frame, 10000)
 		t.Log("received frame or timeout")
-		if ret < 0 {
+		if ret < 0 || err != nil {
 			t.Error("CanSend failed")
 		}
 		if ret == 0 {
@@ -198,7 +193,7 @@ func TestCanReceive2(t *testing.T) {
 		}
 
 		if ret != 16 {
-			t.Error(fmt.Printf("CanRecv did not receive 16 bytes %d", ret))
+			t.Error(fmt.Sprintf("CanRecv did not receive 16 bytes %d", ret))
 		}
 
 		if frame.CanId != 1 {

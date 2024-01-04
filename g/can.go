@@ -17,13 +17,14 @@ type CanFrame struct {
 	Data   [8]byte
 }
 
+var sock C.int = -1
+
 func CanInit(dev string) int {
-	var sock C.int
 	sock = C.canlib_init(C.CString(dev))
 	return int(sock)
 }
 
-func CanSend(sock int, frame *CanFrame) int {
+func CanSend(sock int, frame *CanFrame) (int, error) {
 	var ret C.int
 	var cframe C.struct_canlib_frame
 	cframe.can_id = C.uint(frame.CanId)
@@ -34,11 +35,16 @@ func CanSend(sock int, frame *CanFrame) int {
 		cframe.data[i] = C.uchar(frame.Data[i])
 	}
 	ret = C.canlib_send(C.int(sock), &cframe)
-	return int(ret)
+
+	if ret < 0 {
+		return int(ret), fmt.Errorf("canlib_send() failed: %d %s", ret, CanErrnoString())
+	}
+
+	return int(ret), nil
 }
 
 // CanRecv receives a frame from the socket, blocking
-func CanRecv(sock int, frame *CanFrame, timeout int) int {
+func CanRecv(sock int, frame *CanFrame, timeout int) (int, error) {
 	var ret C.int
 	// var errno _Ctype_uint
 	var cframe C.struct_canlib_frame
@@ -47,7 +53,7 @@ func CanRecv(sock int, frame *CanFrame, timeout int) int {
 	frame.CanDlc = byte(cframe.can_dlc)
 
 	if ret < 0 {
-		return int(ret)
+		return int(ret), fmt.Errorf("canlib_receive() failed: %d %s", ret, CanErrnoString())
 	}
 
 	// always copy 8 bytes
@@ -55,7 +61,7 @@ func CanRecv(sock int, frame *CanFrame, timeout int) int {
 		frame.Data[i] = byte(cframe.data[i])
 	}
 
-	return int(ret)
+	return int(ret), nil
 }
 
 func CanClose(sock int) int {

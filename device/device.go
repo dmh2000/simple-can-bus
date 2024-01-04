@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 	"sync/atomic"
 	"time"
 
@@ -28,16 +29,17 @@ type CANFrame struct {
 // in a goroutine and send the frame back to main for processing
 func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 	var frame can.CanFrame
+	var err error
+
 	for {
 		// receive with timeout
 		ret := 2
-		ret = can.CanRecv(sockfd, &frame, types.DEVICE_RECV_TIMEOUT)
-		if ret < 0 {
-			fmt.Printf("can.CanRecv() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
+		ret, err = can.CanRecv(sockfd, &frame, types.DEVICE_RECV_TIMEOUT)
+		if ret < 0 || err != nil {
+			log.Printf("can.CanRecv() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
 			continue
 		}
 		if ret == 0 {
-			// fmt.Printf("can.CanRecv() timeout: %d\n", ret)
 			continue
 		}
 		select {
@@ -52,6 +54,12 @@ func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 }
 
 func main() {
+
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.Lshortfile)
+
+	print("Starting Simulated Device\n")
+
 	sockfd := can.CanInit("vcan0")
 	defer can.CanClose(sockfd)
 
@@ -94,14 +102,21 @@ func main() {
 				prev_dio_out = state.dio_out
 			}
 			frame16 := can.Uint16Frame(types.ID_DIO_OUT, state.dio_out)
-			can.CanSend(sockfd, &frame16)
+			ret, err := can.CanSend(sockfd, &frame16)
+			if ret < 0 || err != nil {
+				log.Printf("can.CanSend() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
+			}
 
 			if state.adc_out != prev_adc_out {
 				print("ADC OUT: ", state.adc_out, "\n")
 				prev_adc_out = state.adc_out
 			}
 			frame32 := can.Int32Frame(types.ID_ADC_OUT, state.adc_out)
-			can.CanSend(sockfd, &frame32)
+			ret, err = can.CanSend(sockfd, &frame32)
+			if ret < 0 || err != nil {
+				log.Printf("can.CanSend() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
+			}
+
 		}
 	}
 }

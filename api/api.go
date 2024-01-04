@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -49,11 +50,11 @@ func DioSet(w http.ResponseWriter, r *http.Request) {
 	v, err := unmarshalDio(reqBody)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Printf("DioSet error: %s\n", reqBody)
+		log.Printf("DioSet error: %s\n", reqBody)
 		return
 	}
 	device.DioSet = v
-	fmt.Printf("Dio Set: %d\n", v)
+	log.Printf("Dio Set: %d\n", v)
 	// forward to the CAN bus
 	client.PutCanUint16(types.ID_DIO_SET, v)
 }
@@ -69,17 +70,17 @@ func DacSet(w http.ResponseWriter, r *http.Request) {
 	v, err := unmarshalDac(reqBody)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Printf("DacSet error: %s\n", reqBody)
+		log.Printf("DacSet error: %s\n", reqBody)
 		return
 	}
 	device.DacSet = v
-	fmt.Printf("Dac Set: %d\n", v)
+	log.Printf("Dac Set: %d\n", v)
 	// forward to the CAN bus
 	client.PutCanInt32(types.ID_DAC_SET, v)
 }
 
 // get the current dio outputs
-func DeviceOut(w http.ResponseWriter, r *http.Request) {
+func DeviceOutput(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var adc int32
 	var dio uint16
@@ -94,7 +95,7 @@ func DeviceOut(w http.ResponseWriter, r *http.Request) {
 	adc, err = client.GetCanInt32(types.ID_ADC_OUT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Printf("AdcIn error: %d\n", err)
+		log.Printf("AdcIn error: %d\n", err)
 		return
 	}
 	device.AdcOut = adc
@@ -102,12 +103,12 @@ func DeviceOut(w http.ResponseWriter, r *http.Request) {
 	dio, err = client.GetCanUint16(types.ID_DIO_OUT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Printf("AdcIn error: %d\n", err)
+		log.Printf("AdcIn error: %d\n", err)
 		return
 	}
 	device.DioOut = dio
 
-	fmt.Printf("%d %d %d %d\n", device.DioSet, device.DioOut, device.DacSet, device.AdcOut)
+	log.Printf("%d %d %d %d\n", device.DioSet, device.DioOut, device.DacSet, device.AdcOut)
 
 	jsondata, err := json.Marshal(device)
 	if err != nil {
@@ -129,6 +130,11 @@ func setHeaders(w *http.ResponseWriter) {
 }
 
 func main() {
+	print("Starting API server at 127.0.0.1:6001\n")
+
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.Lshortfile)
+
 	// start the client
 	go client.Run()
 
@@ -140,7 +146,7 @@ func main() {
 	r.HandleFunc("/can/2", DacSet).Methods(http.MethodPut, http.MethodOptions)
 	r.Use(mux.CORSMethodMiddleware(r))
 
-	r.HandleFunc("/can/3", DeviceOut).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/can/3", DeviceOutput).Methods(http.MethodGet, http.MethodOptions)
 	r.Use(mux.CORSMethodMiddleware(r))
 
 	log.Fatal(http.ListenAndServe("127.0.0.1:6001", r))

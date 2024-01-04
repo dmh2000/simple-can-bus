@@ -116,6 +116,8 @@ The first two directories, ./c and ./g build the infrastructure required to use 
 
 ## ./c/canlib.c
 
+**See ./c/README.md**
+
 Directory 'c' contains a set of stripped down functions that can be used to send and receive data from a CAN bus interface. The code here has the more complicated incantations to connect to a CAN device using the socket interface. This is based on excerpts from https://github.com/linux-can/can-utils
 
 The Makefile builds libcan.so. It has an option to load it to /usr/local/lib which requires sudo permission. Just remove the comments in the libcan.so rules. If you prefer to just keep it local, no change is needed.
@@ -124,6 +126,8 @@ Two test programs can_test_receive.c and can_test_send.c exercise the interface.
 
 ## ./g/can.go
 
+**See ./g/README.md**
+
 Directory 'g' provides a Go module with functions that use the C libcan.so to interface to a CAN bus interface. This module sends and receives **raw CAN frames**. This directory also contains unit tests. The code here intends to be a very simple wrapper over the C library. This provides basic CAN send/receive support for Go. A real CAN device may have more functionality like error handling and filtering incoming messages. Setting that up would depend on the specific device.
 
 The Makefile compiles the module.
@@ -131,6 +135,8 @@ The Makefile compiles the module.
 <hr/>
 
 ## ./device/device.go
+
+**See ./device/README.md**
 
 Directory ./device implements a program that simulates a CAN sensor unit. It reads CAN messages from a client program, parses them and sends formattted simulated sensor data to the can bus. Think of this program as the microcomputer sensor sitting in the hardware.
 
@@ -144,13 +150,19 @@ The next directories implement the application components needed to implement th
 
 ## ./client/client.go
 
+**See ./client/README.md**
+
 Directory ./client provides a Go API accessible by other Go programs to communicate with the 'device' over the CAN bus. The 'client' is not directly connected to the 'device'. All communication between the two is over the CAN bus. The client implements the specified set of inputs and outputs that the device provides. Think of this program as the application 'backend' that sits in some computer in the system.
 
 ## ./api/api.go
 
+**See ./api/README.md**
+
 Directory "api" contains a web backend that connects to the 'client' program. It provides send/receive functions for a web application that displays and controls the CAN simulation.
 
 ## ./can-ui
+
+**See ./can-ui/README.md**
 
 A web client for accessing the CAN bus data. Its a React/Vite app. In development mode there is no build operation. Just run it from the command line.
 
@@ -170,10 +182,19 @@ The Makefile also includes a 'clean' step.
 
 ## Step 5 : Run the System
 
-- in a terminal, run ./device/device
-- in a terminal, run ./client/client
-- in a terminal, run ./api/api
+To run the components in separate terminals:
+
+- in a terminal, execute ./device/device
+- in a terminal, execute ./api/api
 - in a terminal, start the ./can-ui web client
   - cd into that directory and execute:
     - npm install
     - npm run dev
+
+```bash
+gnome-terminal --tab --  ./device/device
+gnome-terminal --tab --  ./api/api
+pushd ./can-ui
+npm install
+npm run dev
+```
