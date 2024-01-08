@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"sqirvy.xyz/client"
 	"sqirvy.xyz/types"
 )
 
@@ -56,7 +55,7 @@ func DioSet(w http.ResponseWriter, r *http.Request) {
 	device.DioSet = v
 	log.Printf("Dio Set: %d\n", v)
 	// forward to the CAN bus
-	client.PutCanUint16(types.ID_DIO_SET, v)
+	PutCanUint16(types.ID_DIO_SET, v)
 }
 
 func DacSet(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +76,7 @@ func DacSet(w http.ResponseWriter, r *http.Request) {
 	device.DacSet = v
 	log.Printf("Dac Set: %d\n", v)
 	// forward to the CAN bus
-	client.PutCanInt32(types.ID_DAC_SET, v)
+	PutCanInt32(types.ID_DAC_SET, v)
 }
 
 // get the current dio outputs
@@ -93,7 +92,7 @@ func DeviceOutput(w http.ResponseWriter, r *http.Request) {
 	setHeaders(&w)
 
 	// update the outputs
-	adc, err = client.GetCanInt32(types.ID_ADC_OUT)
+	adc, err = GetCanInt32(types.ID_ADC_OUT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("AdcIn error: %d\n", err)
@@ -101,7 +100,7 @@ func DeviceOutput(w http.ResponseWriter, r *http.Request) {
 	}
 	device.AdcOut = adc
 
-	dio, err = client.GetCanUint16(types.ID_DIO_OUT)
+	dio, err = GetCanUint16(types.ID_DIO_OUT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("AdcIn error: %d\n", err)
@@ -137,7 +136,7 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 
 	// start the client
-	go client.Run()
+	go Run()
 
 	r := mux.NewRouter().StrictSlash(true)
 

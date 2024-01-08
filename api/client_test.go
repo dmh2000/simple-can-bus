@@ -1,4 +1,4 @@
-package client_test
+package main
 
 import "testing"
 

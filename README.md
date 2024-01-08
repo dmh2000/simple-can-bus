@@ -6,63 +6,55 @@ This project is a collection of Go and C libraries and programs that set up a ve
 
 The primary sources I used for figuring out CAN and vcan.
 
+https://netmodule-linux.readthedocs.io/en/latest/howto/can.html
 https://github.com/linux-can/can-utils
 https://docs.kernel.org/networking/can.html
 https://elinux.org/CAN_Bus
 https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
 
-## CAN BUS SIMULATION
+## CAN Bus
+
+The Controller Area Network (CAN) bus provides a sort of publish/subscribe model on an electrical bus. Nodes connect to the bus and send (publish) and/or receive (subscribe). CAN is all about messages, not endpoints. A sender (publisher) does not need to know an address for the receive (subscribe) endpoint. There may be not an endpoint listenting for a particular message.
+
+A few things about CAN:
+
+- CAN messages have an ID, length (1-8 bytes) and data
+- any number of 'subscribers' can listen for any number of messages with specified ID's.
+- subscribers don't care who sent the message. They only care about the ID and data.
+- a given message ID can only be sent by a one 'publisher'
+- it is not allowed for multiple publishers to send the same message ID
+- this architecture makes it relatively simple to compose a set of sensors, actuators and computers without having to specify a network graph.
+
+## Linux VCAN
+
+## A Simple CAN Bus Example
+
+Linux has a standard module called vcan (virtual CAN bus) that can be used to model a pphysical system. See the references above for details.
+
+This doc shows how to string together a few software modules and the VCAN device to illustrate using CAN bus in as simple a way as possible.
 
 The architecture looks something like this:
 
-<img src="./simple-can-bus.png"/>
+<img src="./simplecan.drawio.png"/>
 
-Starting at the bottom right of the diagram and going counter-clockwise:
+Starting at the bottom of the diagram and going counter-clockwise:
 
-- Device Simulator : simple simulated device accessible over CAN
-
-  - vcan : the standard vcan module
-  - libcan.so : C library that performs the setup and connections to the CAN bus interface. The low level incantations to access the CAN bus interface is easier to do in C.
-    - in directory "c"
-  - can.go : a Go package that uses libcan.so and exposes a Go interface to the CAN bus
-    - in directory "g"
-  - device : executable device simulator
-    - in directory "device"
-
-- CAN bus 'client' : executable that exposes a run time interface to the simulated device.
-
-  - uses vcan, c/libcan.so and g/can.go
-  - client : a client side executable program that sends and receives CAN bus messages to and from the device simulator. It exposes a Go interface that allows other apps to send and receive CAN bus messages.
-    - in directory "client"
-  - api : a Go web API that talks to the 'client' and lets remote programs read and update the state of the CAN bus simulator
-    - in directory "api"
-
-- Remote user interface
-  - can-ui : a React app that uses the 'api' to provide a user interface to access the CAN bus simuilator
-    - in directory "can-ui"
+- ./device/device.go : simple simulated device accessible over CAN
+  - ./g/can.go module
+  - ./c/canlib.c (libcan.so)
+- VCAN - Linux standard CAN bus simulator
+  - ./c/canlib.c (libcan.so)
+  - ./g/can.go (module)
+- ./api/api.go
+  - web api
+- ./can-ui/src/App.tsx
 
 The CAN bus messages include:
 
-- 1 : ID_DIO_IN : the simulated device listens for this message to set a digital IO register.
+- 1 : ID_DIO_SET : the simulated device listens for this message to set a digital IO register.
 - 2 : ID_DIO_OUT : the simulated device sends data from a digital IO register at 10 Hz. Applications can listen for this message to get updates.
-- 3 : ID_DAC_IN : the simulated device listens for this message to set a digital-to-analog input.
+- 3 : ID_DAC_SET : the simulated device listens for this message to set a digital-to-analog input.
 - 4 : ID_ADC_OUT : the simulated devices sends data from an analog-to-digital device at 10 hz.
-
-### How To Run
-
-- Install the Linux package 'can-utils. Command line tools that can be used to send and receive CAN messages. Its useful in testing.
-- Vcan (Virtual CAN Bus) is a kernel module that creates a virtual CAN bus interface on jthe LINUX system. Install the vcan module on Linux if its not already there. I used Ubuntu 20 which has the support. The instructions here are for debian based systems.
-- Install build-essential, golang (18 or later) and nodejs.
-- Activate the VCAN module for use as a network device (see below)
-- Clone this repo at https://github.com/dmh2000/simple-can-bus
-- cd into top level
-- execute 'make'
-  - the make process is set up to use the local instance of c/libcan.so using LD_LIBRARY_PATH where needed. If you want to make it permanent you can install c/libcan.so into /usr/local/lib. See c/Makefile and uncomment the lines that install that library.
-- in a terminal, run the vcan/device/device program
-- in a terminal, run the vcan/api/api program
-- in a terminal, run the vcan/client/client program
-- in a terminal, start the vcan/can-ui web client
-  - this requires some node setup. See below for details.
 
 ## Dependencies
 
@@ -70,6 +62,8 @@ The CAN bus messages include:
 - node.js
 
 This document assumes a Debian type system, such as Ubuntu. Some operations may be different on a Fedora based system.
+
+Here are the steps to get this built and running:
 
 ## Step 1 : Activate the VCAN IP Device
 
