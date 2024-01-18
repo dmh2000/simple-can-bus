@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>Simple CAN Bus</title>
+    <script
+      src="https://unpkg.com/htmx.org@1.9.10"
+      integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+      integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      .l-box {
+        padding: 0.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="l-box">Simple CAN Bus Demo</h1>
+    <div>
+      <form
+        hx-put="/command"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="outerHTML"
+        class="pure-form pure-form-aligned"
+      ></form>
+    </div>
+    <hr />
+    <div
+      hx-get="/telemetry"
+      hx-trigger="load, every  1s"
+      hx-target="this"
+      hx-swap="innerHTML"
+    >
+      <div class="pure-g">
+        <div class="pure-u-1-5">DIO Command</div>
+        <div class="pure-u-1-5">{{.DioSet}}</div>
+      </div>
+      <div class="pure-g">
+        <div class="pure-u-1-5"><p>DIO Status</p></div>
+        <div class="pure-u-1-5"><p>{{.DioOut}}</p></div>
+      </div>
+      <div class="pure-g">
+        <div class="pure-u-1-5"><p>DAC Command</p></div>
+        <div class="pure-u-1-5"><p>{{.DacSet}}</p></div>
+      </div>
+      <div class="pure-g">
+        <div class="pure-u-1-5"><p>ADC Status</p></div>
+        <div class="pure-u-1-5"><p>{{.AdcOut}}</p></div>
+      </div>
+    </div>
+  </body>
+</html>
