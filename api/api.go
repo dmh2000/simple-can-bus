@@ -20,14 +20,6 @@ type CanDevice struct {
 	AdcOut int32
 }
 
-type Dio struct {
-	dio uint16
-}
-
-type Dac struct {
-	dac int32
-}
-
 var device = CanDevice{DioSet: 0, DioOut: 0, DacSet: 0, AdcOut: 0}
 
 /*

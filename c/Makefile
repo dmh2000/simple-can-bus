@@ -8,6 +8,7 @@ libcan.so : canlib.c canlib.h
 	@echo "------------------------------------------------------"	
 	$(C) -g -Wall -o libcan.so -shared -fPIC canlib.c
 	@echo "------------------------------------------------------"
+	# OPTIONAL: install libcan.so to /usr/local/lib
 	# @echo "Installing libcan.so to /usr/local/lib, requires sudo"
 	# @echo "------------------------------------------------------"
 	# sudo cp libcan.so /usr/local/lib

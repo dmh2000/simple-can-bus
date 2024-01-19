@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"sync/atomic"
 	"time"
 
 	"sqirvy.xyz/can"
@@ -17,20 +16,20 @@ type deviceState struct {
 	adc_out int32
 }
 
-type CANFrame struct {
-	adc_in atomic.Value
-	dio_in atomic.Value
+// type CANFrame struct {
+// 	adc_in atomic.Value
+// 	dio_in atomic.Value
 
-	dio_out atomic.Value
-	adc_out atomic.Value
-}
+// 	dio_out atomic.Value
+// 	adc_out atomic.Value
+// }
 
 // the can bus recv function is blocking so run it
 // in a goroutine and send the frame back to main for processing
 func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 	var frame can.CanFrame
 	var err error
-
+loop:
 	for {
 		// receive with timeout
 		ret := 2
@@ -43,10 +42,8 @@ func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
 			continue
 		}
 		select {
-		case q := <-quit:
-			if q {
-				break
-			}
+		case <-quit:
+			break loop
 		default:
 		}
 		fch <- frame
@@ -76,7 +73,7 @@ func main() {
 	prev_adc_out := int32(0)
 
 	q := false
-	for q == false {
+	for !q {
 		select {
 		case frame := <-fch:
 			// receive from client

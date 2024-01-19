@@ -9,8 +9,8 @@ import (
 )
 
 // IMPORTANT! : The source code comments in this file were
-// created using Github Copilot
-// with the chat prompt : /explain annotate source
+// created using Github Copilot with the chat prompt
+// "/explain annotate source"
 // The generated comments are a bit wordy. Is this level of detail
 // really necessary? I don't know. I'm just trying it out.
 
@@ -110,4 +110,18 @@ func (cmd *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// If the HTTP method is not PUT, respond with a 405 Method Not Allowed status code.
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func (cmd *Command) Init() error {
+	var telemetry = Telemetry{}
+
+	err := telemetry.fetch()
+	if err != nil {
+		return err
+	}
+
+	cmd.DioSet = telemetry.DioSet
+	cmd.DacSet = telemetry.DacSet
+
+	return nil
 }

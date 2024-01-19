@@ -43,32 +43,6 @@ func (s *CanData) getAdcOut() int32 {
 	return v
 }
 
-// the can bus recv function is blocking so run it
-// in a goroutine and send the frame back to main for processing
-func receiver(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
-	var frame can.CanFrame
-	for {
-		// receive with timeout
-		ret, err := can.CanRecv(sockfd, &frame, types.CLIENT_RECV_TIMEOUT)
-		if ret < 0 || err != nil {
-			log.Printf("can.CanRecv() failed: %d %s\n", ret, can.CanErrnoString())
-			continue
-		}
-		if ret == 0 {
-			log.Printf("can.CanRecv() timeout: %d\n", ret)
-			continue
-		}
-		select {
-		case q := <-quit:
-			if q {
-				break
-			}
-		default:
-		}
-		fch <- frame
-	}
-}
-
 // state object
 var canState = new(CanData)
 var sockfd int = -1
@@ -78,8 +52,6 @@ func Run() {
 
 	log.SetOutput(os.Stdout)
 	log.SetFlags(log.Lshortfile)
-
-	print("Starting Client In Background\n")
 
 	sockfd = can.CanInit("vcan0")
 	if sockfd < 0 {
@@ -131,10 +103,8 @@ func PutCanUint16(id int, v uint16) error {
 		if ret < 0 || err != nil {
 			log.Printf("can.CanSend() failed: %d %s\n", ret, can.CanErrnoString())
 		}
-		break
 	default:
 		err = fmt.Errorf("invalid id")
-		break
 	}
 	return err
 }
@@ -150,10 +120,8 @@ func PutCanInt32(id int, v int32) error {
 		if ret < 0 || err != nil {
 			log.Printf("can.CanSend() failed: %d %s\n", ret, can.CanErrnoString())
 		}
-		break
 	default:
 		err = fmt.Errorf("invalid id")
-		break
 	}
 	return err
 }

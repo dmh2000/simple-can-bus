@@ -154,11 +154,11 @@ Directory ./client provides a Go API accessible by other Go programs to communic
 
 Directory "api" contains a web backend that connects to the 'client' program. It provides send/receive functions for a web application that displays and controls the CAN simulation.
 
-## ./can-ui
+## ./ui
 
 **See ./can-ui/README.md**
 
-A web client for accessing the CAN bus data. Its a React/Vite app. In development mode there is no build operation. Just run it from the command line.
+A web client UI for accessing the CAN bus data.
 
 ## Step 4 : Build the System
 
@@ -169,8 +169,8 @@ It builds in this order:
 - ./c/Makefile
 - ./g/Makefile
 - ./device/Makefile
-- ./client/Makefile
 - ./api/Makefile
+- ./ui/Makefile
 
 The Makefile also includes a 'clean' step.
 
@@ -180,15 +180,10 @@ To run the components in separate terminals:
 
 - in a terminal, execute ./device/device
 - in a terminal, execute ./api/api
-- in a terminal, start the ./can-ui web client
-  - cd into that directory and execute:
-    - npm install
-    - npm run dev
+- in a terminal, execute can-ui (must be in ./ui directory)
 
 ```bash
-gnome-terminal --tab --  ./device/device
-gnome-terminal --tab --  ./api/api
-pushd ./can-ui
-npm install
-npm run dev
+gnome-terminal --tab -- ./device/device
+gnome-terminal --tab -- ./api/api
+cd ui && ./can-ui
 ```

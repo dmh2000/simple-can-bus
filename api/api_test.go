@@ -27,11 +27,15 @@ func TestUnmarshall(t *testing.T) {
 		t.Error(err)
 	}
 	var d Dio
-	var i int
-	i, err = strconv.Atoi(v.Dio)
+	i, err := strconv.Atoi(v.Dio)
+	if err != nil {
+		t.Error(err)
+	}
+
 	if i != 1 {
 		t.Errorf("Expected 1, got %d", d.dio)
 	}
+
 	d.dio = uint16(i)
 	if d.dio != 1 {
 		t.Errorf("Expected 1, got %d", d.dio)

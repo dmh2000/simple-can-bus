@@ -16,29 +16,57 @@ type Telemetry struct {
 
 var tmplTelementry = template.Must(template.ParseFiles("telemetry.html"))
 
+func (telemetry *Telemetry) fetch() error {
+	// fetch the API data
+	response, err := http.Get("http://localhost:6001/can/3")
+	if err != nil {
+		return err
+	}
+
+	// read the response body
+	responseData, err := io.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	// unmarshal the response body
+	err = json.Unmarshal(responseData, &telemetry)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (telemetry *Telemetry) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		// fetch the API data
-		response, err := http.Get("http://localhost:6001/can/3")
+
+		err := telemetry.fetch()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		// read the response body
-		responseData, err := io.ReadAll(response.Body)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// // fetch the API data
+		// response, err := http.Get("http://localhost:6001/can/3")
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
 
-		// unmarshal the response body
-		err = json.Unmarshal(responseData, &telemetry)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// // read the response body
+		// responseData, err := io.ReadAll(response.Body)
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
+
+		// // unmarshal the response body
+		// err = json.Unmarshal(responseData, &telemetry)
+		// if err != nil {
+		// 	w.WriteHeader(http.StatusInternalServerError)
+		// 	return
+		// }
 
 		// update the fragment
 		tmplTelementry.Execute(w, telemetry)

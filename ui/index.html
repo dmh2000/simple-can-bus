@@ -15,20 +15,27 @@
 
     <style>
       .l-box {
-        padding: 0.5em;
+        padding: 0.3em;
       }
     </style>
   </head>
   <body>
-    <h1 class="l-box">Simple CAN Bus Demo</h1>
+    <h1 style="text-align: center">Simple CAN Bus Demo</h1>
     <div>
-      <form
-        hx-put="/command"
-        hx-trigger="load"
-        hx-target="this"
-        hx-swap="outerHTML"
-        class="pure-form pure-form-aligned"
-      ></form>
+      <form hx-put="/command" <!-- hx-trigger="load" -->
+        hx-target="this" hx-swap="outerHTML" class="pure-form pure-form-aligned"
+        >
+        <div>DIO Command</div>
+        <input type="text" name="DioSet" value="{{.DioSet}}" />
+        <div>&nbsp;</div>
+        <div>DAC Command</div>
+        <input type="text" name="DacSet" value="{{.DacSet}}" />
+        <div style="padding-top: 0.5em">
+          <button type="submit" class="pure-button pure-button-primary">
+            Update
+          </button>
+        </div>
+      </form>
     </div>
     <hr />
     <div
