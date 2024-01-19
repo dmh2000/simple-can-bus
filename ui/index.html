@@ -17,19 +17,27 @@
       .l-box {
         padding: 0.3em;
       }
+      .fixed-field {
+        display: inline-block;
+        width: 10em;
+      }
     </style>
   </head>
   <body>
     <h1 style="text-align: center">Simple CAN Bus Demo</h1>
     <div>
-      <form hx-put="/command" <!-- hx-trigger="load" -->
-        hx-target="this" hx-swap="outerHTML" class="pure-form pure-form-aligned"
-        >
+      <form
+        hx-put="/update"
+        hx-target="this"
+        hx-swap="outerHTML"
+        class="pure-form l-box"
+      >
+        <h3 class="l-box">Commands</h3>
         <div>DIO Command</div>
-        <input type="text" name="DioSet" value="{{.DioSet}}" />
+        <input type="text" name="DioSet" value="{{.Cmd.DioSet}}" />
         <div>&nbsp;</div>
         <div>DAC Command</div>
-        <input type="text" name="DacSet" value="{{.DacSet}}" />
+        <input type="text" name="DacSet" value="{{.Cmd.DacSet}}" />
         <div style="padding-top: 0.5em">
           <button type="submit" class="pure-button pure-button-primary">
             Update
@@ -39,26 +47,29 @@
     </div>
     <hr />
     <div
-      hx-get="/telemetry"
-      hx-trigger="load, every  1s"
+      hx-get="/update"
+      hx-trigger="every  1s"
       hx-target="this"
       hx-swap="innerHTML"
     >
-      <div class="pure-g">
-        <div class="pure-u-1-5">DIO Command</div>
-        <div class="pure-u-1-5">{{.DioSet}}</div>
-      </div>
-      <div class="pure-g">
-        <div class="pure-u-1-5"><p>DIO Status</p></div>
-        <div class="pure-u-1-5"><p>{{.DioOut}}</p></div>
-      </div>
-      <div class="pure-g">
-        <div class="pure-u-1-5"><p>DAC Command</p></div>
-        <div class="pure-u-1-5"><p>{{.DacSet}}</p></div>
-      </div>
-      <div class="pure-g">
-        <div class="pure-u-1-5"><p>ADC Status</p></div>
-        <div class="pure-u-1-5"><p>{{.AdcOut}}</p></div>
+      <div>
+        <h3 class="l-box">Telemetry</h3>
+        <div class="l-box">
+          <div class="fixed-field">DIO Command</div>
+          <div class="fixed-field">{{.Tel.DioSet}}</div>
+        </div>
+        <div class="l-box">
+          <div class="fixed-field">DIO Status</div>
+          <div class="fixed-field">{{.Tel.DioOut}}</div>
+        </div>
+        <div class="l-box">
+          <div class="fixed-field">DAC Command</div>
+          <div class="fixed-field">{{.Tel.DacSet}}</div>
+        </div>
+        <div class="l-box">
+          <div class="fixed-field">ADC Status</div>
+          <div class="fixed-field">{{.Tel.AdcOut}}</div>
+        </div>
       </div>
     </div>
   </body>

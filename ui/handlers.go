@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"text/template"
@@ -19,7 +21,45 @@ type Command struct {
 	DacSet int32
 }
 
+type Telemetry struct {
+	DioSet int32
+	DioOut int32
+	DacSet int32
+	AdcOut int32
+}
+
+type DeviceState struct {
+	Cmd Command
+	Tel Telemetry
+}
+
 var tmplCommand = template.Must(template.ParseFiles("command.html"))
+var tmplTelementry = template.Must(template.ParseFiles("telemetry.html"))
+
+func (state *DeviceState) fetch() error {
+	// fetch the API data
+	response, err := http.Get("http://localhost:6001/can/3")
+	if err != nil {
+		return err
+	}
+
+	// read the response body
+	responseData, err := io.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	// unmarshal the response body
+	err = json.Unmarshal(responseData, &state.Tel)
+	if err != nil {
+		return err
+	}
+
+	state.Cmd.DioSet = state.Tel.DioSet
+	state.Cmd.DacSet = state.Tel.DacSet
+
+	return nil
+}
 
 // The put function sends a PUT request to the specified URL with the given payload.
 func put(url string, payload string) error {
@@ -53,9 +93,23 @@ func put(url string, payload string) error {
 }
 
 // ServeHTTP makes the Command type an http.Handler.
-func (cmd *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (state *DeviceState) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
 	// Switch on the HTTP method of the request.
 	switch r.Method {
+	case "GET":
+
+		err := state.fetch()
+		if err != nil {
+			// no connection to the API
+			state.Tel.DioSet = -1
+			state.Tel.DioOut = -1
+			state.Tel.DacSet = -1
+			state.Tel.AdcOut = -1
+		}
+
+		// update the fragments
+		tmplTelementry.Execute(w, state)
 	case "PUT":
 		// Parse the form data from the request.
 		err := r.ParseForm()
@@ -81,11 +135,11 @@ func (cmd *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Set the DioSet and DacSet fields of the Command to the parsed values.
-		cmd.DioSet = int32(dio)
-		cmd.DacSet = int32(dac)
+		state.Cmd.DioSet = int32(dio)
+		state.Cmd.DacSet = int32(dac)
 
 		// Create a JSON string with the DioSet value.
-		s := fmt.Sprintf("{\"Dio\": \"%d\"}", cmd.DioSet)
+		s := fmt.Sprintf("{\"Dio\": \"%d\"}", state.Cmd.DioSet)
 		// Send a PUT request to the "/can/1" endpoint with the JSON string as the payload.
 		err = put("http://localhost:6001/can/1", s)
 		// If an error occurs, respond with a 500 Internal Server Error status code and return.
@@ -95,7 +149,7 @@ func (cmd *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Create a JSON string with the DacSet value.
-		s = fmt.Sprintf("{\"Dac\": \"%d\"}", cmd.DacSet)
+		s = fmt.Sprintf("{\"Dac\": \"%d\"}", state.Cmd.DacSet)
 		// Send a PUT request to the "/can/2" endpoint with the JSON string as the payload.
 		err = put("http://localhost:6001/can/2", s)
 		// If an error occurs, respond with a 500 Internal Server Error status code and return.
@@ -104,24 +158,10 @@ func (cmd *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Execute the tmplCommand template with the Command as the data and write the output to the response.
-		tmplCommand.Execute(w, cmd)
+		// update the fragments
+		tmplCommand.Execute(w, state)
 	default:
 		// If the HTTP method is not PUT, respond with a 405 Method Not Allowed status code.
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-}
-
-func (cmd *Command) Init() error {
-	var telemetry = Telemetry{}
-
-	err := telemetry.fetch()
-	if err != nil {
-		return err
-	}
-
-	cmd.DioSet = telemetry.DioSet
-	cmd.DacSet = telemetry.DacSet
-
-	return nil
 }

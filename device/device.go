@@ -10,9 +10,9 @@ import (
 )
 
 type deviceState struct {
-	dio_in  uint16
+	dio_set uint16
 	dio_out uint16
-	adc_in  int32
+	dac_set int32
 	adc_out int32
 }
 
@@ -69,8 +69,8 @@ func main() {
 
 	go recvDevice(sockfd, fch, quit)
 
-	prev_dio_out := uint16(0)
-	prev_adc_out := int32(0)
+	// prev_dio_out := uint16(0)
+	// prev_adc_out := int32(0)
 
 	q := false
 	for !q {
@@ -80,40 +80,44 @@ func main() {
 			switch frame.CanId {
 			case types.ID_DIO_SET:
 				// DIO is uint16
-				state.dio_in = can.BytesToUint16(frame.Data[0:2])
-				print("DIO SET: ", state.dio_in, "\n")
+				state.dio_set = can.BytesToUint16(frame.Data[0:2])
+				print("set DIO SET: ", state.dio_set, "\n")
 			case types.ID_DAC_SET:
 				// DAC is int32
-				state.adc_in = can.BytesToInt32(frame.Data[0:4])
-				print("ADC SET: ", state.adc_in, "\n")
+				state.dac_set = can.BytesToInt32(frame.Data[0:4])
+				print("set ADC SET: ", state.dac_set, "\n")
 			default:
 			}
 		case <-time.After(1000 * time.Millisecond):
 			// update the simulator
-			state.dio_out = state.dio_in
-			state.adc_out = state.adc_in
+			state.dio_out = state.dio_set
+			state.adc_out = state.dac_set
 
-			// send to client
-			if state.dio_out != prev_dio_out {
-				print("DIO OUT: ", state.dio_out, "\n")
-				prev_dio_out = state.dio_out
-			}
 			frame16 := can.Uint16Frame(types.ID_DIO_OUT, state.dio_out)
 			ret, err := can.CanSend(sockfd, &frame16)
 			if ret < 0 || err != nil {
 				log.Printf("can.CanSend() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
 			}
 
-			if state.adc_out != prev_adc_out {
-				print("ADC OUT: ", state.adc_out, "\n")
-				prev_adc_out = state.adc_out
+			frame16 = can.Uint16Frame(types.ID_DIO_SET, state.dio_set)
+			ret, err = can.CanSend(sockfd, &frame16)
+			if ret < 0 || err != nil {
+				log.Printf("can.CanSend() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
 			}
+
 			frame32 := can.Int32Frame(types.ID_ADC_OUT, state.adc_out)
 			ret, err = can.CanSend(sockfd, &frame32)
 			if ret < 0 || err != nil {
 				log.Printf("can.CanSend() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
 			}
 
+			frame32 = can.Int32Frame(types.ID_DAC_SET, state.dac_set)
+			ret, err = can.CanSend(sockfd, &frame32)
+			if ret < 0 || err != nil {
+				log.Printf("can.CanSend() failed: %d %d %s\n", ret, can.CanErrno(), can.CanErrnoString())
+			}
+
+			print(state.dio_out, " ", state.dio_set, " ", state.adc_out, " ", state.dac_set, "\n")
 		}
 	}
 }

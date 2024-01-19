@@ -3,47 +3,37 @@ package main
 import (
 	"net/http"
 	"text/template"
-	"time"
 )
 
 func main() {
-	var command = Command{}
-	var telemetry = Telemetry{}
 	var index = template.Must(template.ParseFiles("index.html"))
 
-	// init the command data
-	command.DioSet = 0
-	command.DacSet = 0
-	for i := 0; i < 10; i++ {
-		err := command.Init()
-		if err == nil {
-			break
-		}
-		time.Sleep(1 * time.Second)
+	var state = DeviceState{}
+	err := state.fetch()
+	if err != nil {
+		print()
 	}
-
-	print(command.DioSet)
-	print(command.DacSet)
+	state.Tel.DioSet = state.Tel.DioOut
+	state.Tel.DacSet = state.Tel.AdcOut
+	state.Cmd.DioSet = state.Tel.DioOut
+	state.Cmd.DacSet = state.Tel.AdcOut
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			index.Execute(w, command)
+			index.Execute(w, state)
 
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	})
 
-	// handle command updates
-	mux.Handle("/command", &command)
-
-	// handle telemetry updates
-	mux.Handle("/telemetry", &telemetry)
+	// handle parameter updates
+	mux.Handle("/update", &state)
 
 	print("Server is running on http://127.0.0.1:8000\n")
-	err := http.ListenAndServe("127.0.0.1:8000", mux)
+	err = http.ListenAndServe("127.0.0.1:8000", mux)
 	if err != nil {
 		panic(err)
 	}

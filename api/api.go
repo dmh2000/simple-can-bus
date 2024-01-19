@@ -74,7 +74,6 @@ func DacSet(w http.ResponseWriter, r *http.Request) {
 // get the current dio outputs
 func DeviceOutput(w http.ResponseWriter, r *http.Request) {
 	var err error
-	var adc int32
 	var dio uint16
 
 	setCors(&w)
@@ -84,21 +83,37 @@ func DeviceOutput(w http.ResponseWriter, r *http.Request) {
 	setHeaders(&w)
 
 	// update the outputs
-	adc, err = GetCanInt32(types.ID_ADC_OUT)
+	adc, err := GetCanInt32(types.ID_ADC_OUT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("AdcIn error: %d\n", err)
+		log.Printf("AdcOut error: %d\n", err)
 		return
 	}
 	device.AdcOut = adc
 
+	dac, err := GetCanInt32(types.ID_DAC_SET)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("DacIn error: %d\n", err)
+		return
+	}
+	device.DacSet = dac
+
 	dio, err = GetCanUint16(types.ID_DIO_OUT)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("AdcIn error: %d\n", err)
+		log.Printf("DioOut error: %d\n", err)
 		return
 	}
 	device.DioOut = dio
+
+	dio, err = GetCanUint16(types.ID_DIO_SET)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("DioIn error: %d\n", err)
+		return
+	}
+	device.DioSet = dio
 
 	log.Printf("%d %d %d %d\n", device.DioSet, device.DioOut, device.DacSet, device.AdcOut)
 

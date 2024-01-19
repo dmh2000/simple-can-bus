@@ -29,6 +29,11 @@ func (s *CanData) putDioSet(v uint16) {
 	s.dio_in.Store(uint32(v))
 }
 
+func (s *CanData) getDioSet() uint16 {
+	v := s.dio_in.Load()
+	return uint16(v)
+}
+
 func (s *CanData) getDioOut() uint16 {
 	v := s.dio_out.Load()
 	return uint16(v)
@@ -36,6 +41,11 @@ func (s *CanData) getDioOut() uint16 {
 
 func (s *CanData) putDacSet(v int32) {
 	s.adc_in.Store(int32(v))
+}
+
+func (s *CanData) getDacSet() int32 {
+	v := s.adc_in.Load()
+	return v
 }
 
 func (s *CanData) getAdcOut() int32 {
@@ -133,6 +143,9 @@ func GetCanUint16(id int) (uint16, error) {
 	case types.ID_DIO_OUT:
 		v = canState.getDioOut()
 		err = nil
+	case types.ID_DIO_SET:
+		v = canState.getDioSet()
+		err = nil
 	default:
 		v = 0
 		err = fmt.Errorf("invalid id")
@@ -148,6 +161,8 @@ func GetCanInt32(id int) (int32, error) {
 	case types.ID_ADC_OUT:
 		v = canState.getAdcOut()
 		err = nil
+	case types.ID_DAC_SET:
+		v = canState.getDacSet()
 	default:
 		v = 0
 		err = fmt.Errorf("invalid id")

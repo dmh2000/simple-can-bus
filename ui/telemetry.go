@@ -1,76 +1,44 @@
 package main
 
-import (
-	"encoding/json"
-	"io"
-	"net/http"
-	"text/template"
-)
+// var tmplTelementry = template.Must(template.ParseFiles("telemetry.html"))
 
-type Telemetry struct {
-	DioSet int32
-	DioOut int32
-	DacSet int32
-	AdcOut int32
-}
+// func (state DeviceState) fetch() error {
+// 	// fetch the API data
+// 	response, err := http.Get("http://localhost:6001/can/3")
+// 	if err != nil {
+// 		return err
+// 	}
 
-var tmplTelementry = template.Must(template.ParseFiles("telemetry.html"))
+// 	// read the response body
+// 	responseData, err := io.ReadAll(response.Body)
+// 	if err != nil {
+// 		return err
+// 	}
 
-func (telemetry *Telemetry) fetch() error {
-	// fetch the API data
-	response, err := http.Get("http://localhost:6001/can/3")
-	if err != nil {
-		return err
-	}
+// 	// unmarshal the response body
+// 	err = json.Unmarshal(responseData, &state.Telemetry)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
 
-	// read the response body
-	responseData, err := io.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
+// func (state DeviceState) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	switch r.Method {
+// 	case "GET":
 
-	// unmarshal the response body
-	err = json.Unmarshal(responseData, &telemetry)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// 		err := state.fetch()
+// 		if err != nil {
+// 			// no connection to the API
+// 			state.Telemetry.DioSet = -1
+// 			state.Telemetry.DioOut = -1
+// 			state.Telemetry.DacSet = -1
+// 			state.Telemetry.AdcOut = -1
+// 		}
 
-func (telemetry *Telemetry) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-
-		err := telemetry.fetch()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		// // fetch the API data
-		// response, err := http.Get("http://localhost:6001/can/3")
-		// if err != nil {
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-
-		// // read the response body
-		// responseData, err := io.ReadAll(response.Body)
-		// if err != nil {
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-
-		// // unmarshal the response body
-		// err = json.Unmarshal(responseData, &telemetry)
-		// if err != nil {
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	return
-		// }
-
-		// update the fragment
-		tmplTelementry.Execute(w, telemetry)
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
-}
+// 		// update the fragment
+// 		tmplTelementry.Execute(w, state)
+// 	default:
+// 		w.WriteHeader(http.StatusMethodNotAllowed)
+// 	}
+// }

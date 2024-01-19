@@ -1,17 +1,39 @@
-<h3 class="l-box">Telemetry</h3>
-<div class="pure-g l-box">
-  <div class="pure-u-1-5">DIO Command</div>
-  <div class="pure-u-1-5">{{.DioSet}}</div>
-</div>
-<div class="pure-g l-box">
-  <div class="pure-u-1-5">DIO Status</div>
-  <div class="pure-u-1-5">{{.DioOut}}</div>
-</div>
-<div class="pure-g l-box">
-  <div class="pure-u-1-5">DAC Command</div>
-  <div class="pure-u-1-5">{{.DacSet}}</div>
-</div>
-<div class="pure-g l-box">
-  <div class="pure-u-1-5">ADC Status</div>
-  <div class="pure-u-1-5">{{.AdcOut}}</div>
+<!-- <div>
+  <h3 class="l-box">Telemetry</h3>
+  <div class="pure-g l-box">
+    <div class="pure-u-2-5">DIO Command</div>
+    <div class="pure-u-2-5">{{.Tel.DioSet}}</div>
+  </div>
+  <div class="pure-g l-box">
+    <div class="pure-u-2-5">DIO Status</div>
+    <div class="pure-u-2-5">{{.Tel.DioOut}}</div>
+  </div>
+  <div class="pure-g l-box">
+    <div class="pure-u-2-5">DAC Command</div>
+    <div class="pure-u-2-5">{{.Tel.DacSet}}</div>
+  </div>
+  <div class="pure-g l-box">
+    <div class="pure-u-2-5">ADC Status</div>
+    <div class="pure-u-2-5">{{.Tel.AdcOut}}</div>
+  </div>
+</div> -->
+
+<div>
+  <h3 class="l-box">Telemetry</h3>
+  <div class="l-box">
+    <div class="fixed-field">DIO Command</div>
+    <div class="fixed-field">{{.Tel.DioSet}}</div>
+  </div>
+  <div class="l-box">
+    <div class="fixed-field">DIO Status</div>
+    <div class="fixed-field">{{.Tel.DioOut}}</div>
+  </div>
+  <div class="l-box">
+    <div class="fixed-field">DAC Command</div>
+    <div class="fixed-field">{{.Tel.DacSet}}</div>
+  </div>
+  <div class="l-box">
+    <div class="fixed-field">ADC Status</div>
+    <div class="fixed-field">{{.Tel.AdcOut}}</div>
+  </div>
 </div>
