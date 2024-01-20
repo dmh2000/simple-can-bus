@@ -26,8 +26,8 @@ type deviceState struct {
 
 // the can bus recv function is blocking so run it
 // in a goroutine and send the frame back to main for processing
-func recvDevice(sockfd int, fch chan<- can.CanFrame, quit <-chan bool) {
-	var frame can.CanFrame
+func recvDevice(sockfd int, fch chan<- types.CanFrame, quit <-chan bool) {
+	var frame types.CanFrame
 	var err error
 loop:
 	for {
@@ -62,7 +62,7 @@ func main() {
 
 	state := deviceState{0, 0, 0, 0}
 
-	fch := make(chan can.CanFrame)
+	fch := make(chan types.CanFrame)
 	defer close(fch)
 	quit := make(chan bool)
 	defer close(quit)

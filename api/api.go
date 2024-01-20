@@ -13,14 +13,7 @@ import (
 	"sqirvy.xyz/types"
 )
 
-type CanDevice struct {
-	DioSet uint16
-	DioOut uint16
-	DacSet int32
-	AdcOut int32
-}
-
-var device = CanDevice{DioSet: 0, DioOut: 0, DacSet: 0, AdcOut: 0}
+var device = types.CanDevice{DioSet: 0, DioOut: 0, DacSet: 0, AdcOut: 0}
 
 /*
 	URLS

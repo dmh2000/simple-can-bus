@@ -183,7 +183,12 @@ To run the components in separate terminals:
 - in a terminal, execute can-ui (must be in ./ui directory)
 
 ```bash
-gnome-terminal --tab -- ./device/device
-gnome-terminal --tab -- ./api/api
+# first terminal
+cd device && ./device
+
+# second terminal
+cd api && ./api
+
+# third terminal
 cd ui && ./can-ui
 ```

@@ -7,6 +7,7 @@ import (
 	"unsafe"
 
 	. "sqirvy.xyz/can"
+	"sqirvy.xyz/types"
 )
 
 func TestCanInit(t *testing.T) {
@@ -35,7 +36,7 @@ func TestCanSend(t *testing.T) {
 		t.Error("CanInit failed")
 	}
 
-	var frame CanFrame
+	var frame types.CanFrame
 	frame.CanId = 99
 	frame.CanDlc = 8
 	for i := 0; i < 8; i++ {
@@ -67,7 +68,7 @@ func TestCanReceive1(t *testing.T) {
 			t.Error("CanInit failed")
 		}
 
-		var frame CanFrame
+		var frame types.CanFrame
 		frame.CanId = 99
 		frame.CanDlc = 8
 		for i := 0; i < 8; i++ {
@@ -91,9 +92,8 @@ func TestCanReceive1(t *testing.T) {
 			t.Error("CanInit failed")
 		}
 
-		var frame CanFrame
+		var frame types.CanFrame
 
-		// run cansend vcan0 in another terminal to see the frame
 		ret, err := CanRecv(sock, &frame, 10000)
 		t.Log("received frame or timeout")
 		if ret < 0 || err != nil {
@@ -149,7 +149,7 @@ func TestCanReceive2(t *testing.T) {
 			t.Error("CanInit failed")
 		}
 
-		var frame CanFrame
+		var frame types.CanFrame
 		frame.CanId = 1
 		frame.CanDlc = 4
 		for i := 0; i < 4; i++ {
@@ -173,7 +173,7 @@ func TestCanReceive2(t *testing.T) {
 			t.Error("CanInit failed")
 		}
 
-		var frame CanFrame
+		var frame types.CanFrame
 
 		ret, err := CanRecv(sock, &frame, 10000)
 		t.Log("received frame or timeout")

@@ -11,45 +11,44 @@ import (
 )
 
 type CanData struct {
-	adc_in atomic.Int32
-	dio_in atomic.Uint32
-
-	dio_out atomic.Uint32
-	adc_out atomic.Int32
+	DioSet atomic.Uint32
+	DioOut atomic.Uint32
+	DacSet atomic.Int32
+	AdcOut atomic.Int32
 }
 
 func (s *CanData) init(sock int) {
-	s.dio_in.Store(0)
-	s.dio_out.Store(0)
-	s.adc_in.Store(0)
-	s.adc_out.Store(0)
+	s.DioSet.Store(0)
+	s.DioOut.Store(0)
+	s.DacSet.Store(0)
+	s.AdcOut.Store(0)
 }
 
 func (s *CanData) putDioSet(v uint16) {
-	s.dio_in.Store(uint32(v))
+	s.DioSet.Store(uint32(v))
 }
 
 func (s *CanData) getDioSet() uint16 {
-	v := s.dio_in.Load()
+	v := s.DioSet.Load()
 	return uint16(v)
 }
 
 func (s *CanData) getDioOut() uint16 {
-	v := s.dio_out.Load()
+	v := s.DioOut.Load()
 	return uint16(v)
 }
 
 func (s *CanData) putDacSet(v int32) {
-	s.adc_in.Store(int32(v))
+	s.DacSet.Store(int32(v))
 }
 
 func (s *CanData) getDacSet() int32 {
-	v := s.adc_in.Load()
+	v := s.DacSet.Load()
 	return v
 }
 
 func (s *CanData) getAdcOut() int32 {
-	v := s.adc_out.Load()
+	v := s.AdcOut.Load()
 	return v
 }
 
@@ -58,7 +57,7 @@ var canState = new(CanData)
 var sockfd int = -1
 
 func Run() {
-	var frame can.CanFrame
+	var frame types.CanFrame
 
 	log.SetOutput(os.Stdout)
 	log.SetFlags(log.Lshortfile)
@@ -87,10 +86,16 @@ func Run() {
 		switch frame.CanId {
 		case types.ID_DIO_OUT:
 			v := uint16(can.BytesToUint16(frame.Data[:]))
-			canState.dio_out.Store(uint32(v))
+			canState.DioOut.Store(uint32(v))
+		case types.ID_DIO_SET:
+			v := uint16(can.BytesToUint16(frame.Data[:]))
+			canState.DioSet.Store(uint32(v))
 		case types.ID_ADC_OUT:
 			v := int32(can.BytesToInt32(frame.Data[:]))
-			canState.adc_out.Store(v)
+			canState.AdcOut.Store(v)
+		case types.ID_DAC_SET:
+			v := int32(can.BytesToInt32(frame.Data[:]))
+			canState.DacSet.Store(v)
 		default:
 		}
 	}

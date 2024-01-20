@@ -3,19 +3,14 @@ package can
 import (
 	"fmt"
 	"syscall"
+
+	"sqirvy.xyz/types"
 )
 
 //#cgo CFLAGS: -g -Wall -I../c
 //#cgo LDFLAGS: -L${SRCDIR}/../c -lcan
 //#include "canlib.h"
 import "C"
-
-// note : sizeof canlib_frame is 16 bytes due to padding alignment
-type CanFrame struct {
-	CanId  uint32
-	CanDlc byte
-	Data   [8]byte
-}
 
 var sock C.int = -1
 
@@ -24,7 +19,7 @@ func CanInit(dev string) int {
 	return int(sock)
 }
 
-func CanSend(sock int, frame *CanFrame) (int, error) {
+func CanSend(sock int, frame *types.CanFrame) (int, error) {
 	var ret C.int
 	var cframe C.struct_canlib_frame
 	cframe.can_id = C.uint(frame.CanId)
@@ -44,7 +39,7 @@ func CanSend(sock int, frame *CanFrame) (int, error) {
 }
 
 // CanRecv receives a frame from the socket, blocking
-func CanRecv(sock int, frame *CanFrame, timeout int) (int, error) {
+func CanRecv(sock int, frame *types.CanFrame, timeout int) (int, error) {
 	var ret C.int
 	// var errno _Ctype_uint
 	var cframe C.struct_canlib_frame
@@ -69,7 +64,7 @@ func CanClose(sock int) int {
 	return int(ret)
 }
 
-func CanPrint(frame *CanFrame) {
+func CanPrint(frame *types.CanFrame) {
 	fmt.Printf("%d\n", frame.CanId)
 	fmt.Printf("%d\n", frame.CanDlc)
 	for i := 0; i < 8; i++ {
@@ -88,8 +83,8 @@ func CanErrnoString() string {
 	return syscall.Errno(errno).Error()
 }
 
-func Uint16Frame(id uint32, v uint16) CanFrame {
-	frame := CanFrame{}
+func Uint16Frame(id uint32, v uint16) types.CanFrame {
+	frame := types.CanFrame{}
 	frame.CanId = id
 	frame.CanDlc = 2
 	b := Uint16ToBytes(v)
@@ -99,8 +94,8 @@ func Uint16Frame(id uint32, v uint16) CanFrame {
 	return frame
 }
 
-func Int32Frame(id uint32, v int32) CanFrame {
-	frame := CanFrame{}
+func Int32Frame(id uint32, v int32) types.CanFrame {
+	frame := types.CanFrame{}
 	frame.CanId = id
 	frame.CanDlc = 4
 	b := Int32ToBytes(v)
