@@ -29,5 +29,5 @@ jobs:
           cache-dependency-path: go.work.sum
           # Target architecture for Go to use. Examples: x86, x64. Will use system architecture by default.
           # architecture: # optional
-      - run: go install staticcheck
+      - run: go install honnef.co/go/tools/cmd/staticcheck@latest
       - run: make
