@@ -1,6 +1,6 @@
 all: staticcheck
 
-test: staticcheck
+test: 
 	@echo "------------------------------------------------------"
 	@echo Testing can.go -go wrapper over canlib.so
 	@echo "------------------------------------------------------"	

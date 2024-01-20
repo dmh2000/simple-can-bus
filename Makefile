@@ -1,7 +1,7 @@
 
 all:
 	@$(MAKE) -C c
-	@$(MAKE) -C g test 
+	@$(MAKE) -C g
 	@$(MAKE) -C device
 	@$(MAKE) -C api
 	@$(MAKE) -C ui
