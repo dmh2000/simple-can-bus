@@ -118,6 +118,10 @@ The Makefile builds libcan.so. It has an option to load it to /usr/local/lib whi
 
 Two test programs can_test_receive.c and can_test_send.c exercise the interface.
 
+## ./types/types.go
+
+A central location for some shared types
+
 ## ./g/can.go
 
 **See ./g/README.md**
@@ -180,7 +184,7 @@ To run the components in separate terminals:
 
 - in a terminal, execute ./device/device
 - in a terminal, execute ./api/api
-- in a terminal, execute can-ui (must be in ./ui directory)
+- in a terminal, execute can-ui (must be in ./ui directory for template file access)
 
 ```bash
 # first terminal
