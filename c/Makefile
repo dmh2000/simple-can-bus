@@ -1,6 +1,6 @@
 export C=gcc
 
-all: libcan.so canlib_test_receive canlib_test_send
+all: libcan.so 
 
 libcan.so : canlib.c canlib.h
 	@echo "------------------------------------------------------"
@@ -13,6 +13,8 @@ libcan.so : canlib.c canlib.h
 	# @echo "------------------------------------------------------"
 	# sudo cp libcan.so /usr/local/lib
 	# sudo ldconfig
+
+test: canlib_test_receive canlib_test_send
 
 canlib_test_receive : canlib_test_receive.c libcan.so
 	$(C) -g -Wall -o canlib_test_receive -L. canlib_test_receive.c -lcan
