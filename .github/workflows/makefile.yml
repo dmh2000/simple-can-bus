@@ -24,9 +24,9 @@ jobs:
           # Since there's a default, this is typically not supplied by the user. When running this action on github.com, the default value is sufficient. When running on GHES, you can pass a personal access token for github.com if you are experiencing rate limiting.
           # token: # optional, default is ${{ github.server_url == 'https://github.com' && github.token || '' }}
           # Used to specify whether caching is needed. Set to true, if you'd like to enable caching.
-          # cache: false
+          cache: false
           # Used to specify the path to a dependency file - go.sum
-          # cache-dependency-path: # optional
+          cache-dependency-path: go.work.sum
           # Target architecture for Go to use. Examples: x86, x64. Will use system architecture by default.
           # architecture: # optional
       - run: make
