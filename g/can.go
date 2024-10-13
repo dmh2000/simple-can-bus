@@ -3,25 +3,29 @@ package can
 import (
 	"fmt"
 	"syscall"
+	"unsafe"
 
 	"sqirvy.xyz/types"
 )
 
-//#cgo CFLAGS: -g -Wall -I../c
-//#cgo LDFLAGS: -L${SRCDIR}/../c -lcan
-//#include "canlib.h"
+// #cgo CFLAGS: -g -Wall -I${SRCDIR}/../c
+// #cgo LDFLAGS: -L${SRCDIR}/../c -lcan
+// #include <stdlib.h>
+// #include "canlib.h"
 import "C"
 
 var sock C.int = -1
 
 func CanInit(dev string) int {
-	sock = C.canlib_init(C.CString(dev))
+	d := C.CString(dev)
+	defer C.free(unsafe.Pointer(d))
+	sock = C.canlib_init(d)
 	return int(sock)
 }
 
 func CanSend(sock int, frame *types.CanFrame) (int, error) {
 	var ret C.int
-	var cframe C.struct_canlib_frame
+	var cframe C.canlib_frame_t
 	cframe.can_id = C.uint(frame.CanId)
 	cframe.can_dlc = C.uchar(frame.CanDlc)
 

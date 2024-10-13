@@ -1,4 +1,5 @@
 all: staticcheck
+	go build *.go
 
 test: 
 	@echo "------------------------------------------------------"
@@ -10,4 +11,4 @@ staticcheck:
 	staticcheck *.go
 
 clean:
-	rm -f canlib.h libcan.so
+	rm -f canlib.h
