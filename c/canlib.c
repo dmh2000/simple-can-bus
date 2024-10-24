@@ -25,9 +25,13 @@ int canlib_init(const char *can_dev)
 	int sock;
 	int status;
 
+	if (!can_dev) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	if (sock < 0)
-	{
+	if (sock < 0) {
 		return -1;
 	}
 
@@ -35,9 +39,9 @@ int canlib_init(const char *can_dev)
 	strncpy(ifr.ifr_name, can_dev, IFNAMSIZ - 1);
 	ifr.ifr_name[IFNAMSIZ - 1] = '\0';
 	ifr.ifr_ifindex = if_nametoindex(can_dev);
-	if (ifr.ifr_ifindex == 0)
-	{
-		return -2;
+	if (ifr.ifr_ifindex == 0) {
+		close(sock);
+		return -1;
 	}
 
 	struct sockaddr_can addr;
@@ -45,9 +49,9 @@ int canlib_init(const char *can_dev)
 	addr.can_family = AF_CAN;
 	addr.can_ifindex = ifr.ifr_ifindex;
 	status = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
-	if (status < 0)
-	{
-		return -3;
+	if (status < 0) {
+		close(sock);
+		return -1;
 	}
 
 	return sock;
@@ -56,6 +60,11 @@ int canlib_init(const char *can_dev)
 // @return bytes read, 0 if timeout, < 0 if error
 int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 {
+	if (can_frame == NULL || can_sock < 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	struct can_frame frame;
 	fd_set readfds;
 	struct timeval timeout;
@@ -101,6 +110,16 @@ int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 
 int canlib_send(int can_sock, canlib_frame_t *can_frame)
 {
+	if (can_frame == NULL || can_sock < 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (can_frame->can_dlc > CAN_MAX_DATA_LEN) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	struct can_frame frame;
 
 	// transfer data from canlib_frame_t

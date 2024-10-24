@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     can_sock = canlib_init("vcan0");
     if (can_sock < 0)
     {
-        printf("Error initializing CAN interface %s\n", argv[1]);
+        fprintf(stderr, "Error initializing CAN interface: %s\n", strerror(errno));
         return 1;
     }
 
