@@ -50,7 +50,7 @@ int canlib_receive(int can_sock, canlib_frame_t *frame, int timeout_ms);
  * @param frame Pointer to frame structure containing data to send
  * @return Number of bytes sent on success, negative error code on failure
  */
-int canlib_send(int can_sock, canlib_frame_t *frame);
+int canlib_send(int can_sock, const canlib_frame_t *frame);
 
 /**
  * Close a CAN socket

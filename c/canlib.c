@@ -184,8 +184,7 @@ int canlib_close(int can_sock)
 {
 	int status = 0;
 
-	if (can_sock > 0)
-	{
+	if (can_sock >= 0) {
 		status = close(can_sock);
 	}
 
