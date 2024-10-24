@@ -12,13 +12,26 @@
 #include <errno.h>
 #include "canlib.h"
 
+/**
+ * Get the last system error status
+ * Returns the system errno value as uint32_t
+ */
 uint32_t canlib_status(void)
 {
 	return (uint32_t)errno;
 }
 
 /**
- * initialize the can bus and the client networks for sending
+ * Initialize a CAN interface for communication
+ * 
+ * Creates and configures a socket for CAN communication using the specified interface.
+ * 
+ * @param can_dev Name of CAN interface (e.g. "can0")
+ * @return Positive socket descriptor on success, negative error code on failure:
+ *         CANLIB_ERR_PARAM if can_dev is NULL
+ *         CANLIB_ERR_SOCKET if socket creation fails
+ *         CANLIB_ERR_INTERFACE if interface lookup fails
+ *         CANLIB_ERR_BIND if binding to interface fails
  */
 int canlib_init(const char *can_dev)
 {
@@ -57,7 +70,20 @@ int canlib_init(const char *can_dev)
 	return sock;
 }
 
-// @return bytes read, 0 if timeout, < 0 if error
+/**
+ * Receive a CAN frame with timeout
+ * 
+ * Waits for data on the CAN bus with a specified timeout period.
+ * Uses select() for timeout functionality.
+ * 
+ * @param can_sock Socket descriptor from canlib_init
+ * @param can_frame Pointer to frame structure to store received data
+ * @param timeout_ms Timeout in milliseconds
+ * @return Number of bytes read on success, or error code:
+ *         CANLIB_ERR_PARAM if invalid parameters
+ *         CANLIB_ERR_IO if I/O error occurs
+ *         CANLIB_ERR_TIMEOUT if operation times out
+ */
 int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 {
 	if (can_frame == NULL || can_sock < 0) {
@@ -108,6 +134,18 @@ int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 	return bytes;
 }
 
+/**
+ * Send a CAN frame
+ * 
+ * Transmits a CAN frame on the specified socket.
+ * Validates frame parameters before sending.
+ * 
+ * @param can_sock Socket descriptor from canlib_init
+ * @param can_frame Pointer to frame structure containing data to send
+ * @return Number of bytes sent on success, or error code:
+ *         CANLIB_ERR_PARAM if invalid parameters
+ *         CANLIB_ERR_IO if write operation fails
+ */
 int canlib_send(int can_sock, canlib_frame_t *can_frame)
 {
 	if (can_frame == NULL || can_sock < 0) {
@@ -136,6 +174,14 @@ int canlib_send(int can_sock, canlib_frame_t *can_frame)
 	return bytes;
 }
 
+/**
+ * Close a CAN socket
+ * 
+ * Safely closes an open CAN socket.
+ * 
+ * @param can_sock Socket descriptor to close
+ * @return CANLIB_OK on success, CANLIB_ERR_IO if close fails
+ */
 int canlib_close(int can_sock)
 {
 	int status = 0;
