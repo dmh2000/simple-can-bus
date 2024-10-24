@@ -38,5 +38,6 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
+    canlib_close(can_sock);
     return 0;
 }
