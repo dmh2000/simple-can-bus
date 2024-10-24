@@ -3,6 +3,15 @@
 
 #include <stdint.h>
 
+/* Error codes (all negative) */
+#define CANLIB_OK             0
+#define CANLIB_ERR_PARAM     -1  /* Invalid parameter */
+#define CANLIB_ERR_SOCKET    -2  /* Socket creation failed */
+#define CANLIB_ERR_BIND      -3  /* Socket bind failed */
+#define CANLIB_ERR_INTERFACE -4  /* CAN interface error */
+#define CANLIB_ERR_IO        -5  /* I/O error */
+#define CANLIB_ERR_TIMEOUT   -6  /* Operation timed out */
+
 #define CAN_MAX_DATA_LEN 8
 
 // CAN frame structure

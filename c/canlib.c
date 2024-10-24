@@ -27,12 +27,12 @@ int canlib_init(const char *can_dev)
 
 	if (!can_dev) {
 		errno = EINVAL;
-		return -1;
+		return CANLIB_ERR_PARAM;
 	}
 
 	sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (sock < 0) {
-		return -1;
+		return CANLIB_ERR_SOCKET;
 	}
 
 	struct ifreq ifr;
@@ -41,7 +41,7 @@ int canlib_init(const char *can_dev)
 	ifr.ifr_ifindex = if_nametoindex(can_dev);
 	if (ifr.ifr_ifindex == 0) {
 		close(sock);
-		return -1;
+		return CANLIB_ERR_INTERFACE;
 	}
 
 	struct sockaddr_can addr;
@@ -51,7 +51,7 @@ int canlib_init(const char *can_dev)
 	status = bind(sock, (struct sockaddr *)&addr, sizeof(addr));
 	if (status < 0) {
 		close(sock);
-		return -1;
+		return CANLIB_ERR_BIND;
 	}
 
 	return sock;
@@ -62,7 +62,7 @@ int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 {
 	if (can_frame == NULL || can_sock < 0) {
 		errno = EINVAL;
-		return -1;
+		return CANLIB_ERR_PARAM;
 	}
 
 	struct can_frame frame;
@@ -79,19 +79,19 @@ int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 	if (status < 0)
 	{
 		// error
-		return status;
+		return CANLIB_ERR_IO;
 	}
 	if (status == 0)
 	{
 		// timeout
-		return 0;
+		return CANLIB_ERR_TIMEOUT;
 	}
 
 	// should be read is available
 	if (!FD_ISSET(can_sock, &readfds))
 	{
 		// error
-		return -1;
+		return CANLIB_ERR_IO;
 	}
 
 	bytes = read(can_sock, &frame, sizeof(struct can_frame));
@@ -112,12 +112,12 @@ int canlib_send(int can_sock, canlib_frame_t *can_frame)
 {
 	if (can_frame == NULL || can_sock < 0) {
 		errno = EINVAL;
-		return -1;
+		return CANLIB_ERR_PARAM;
 	}
 
 	if (can_frame->can_dlc > CAN_MAX_DATA_LEN) {
 		errno = EINVAL;
-		return -1;
+		return CANLIB_ERR_PARAM;
 	}
 
 	struct can_frame frame;
@@ -130,7 +130,7 @@ int canlib_send(int can_sock, canlib_frame_t *can_frame)
 	int bytes = write(can_sock, &frame, sizeof(struct can_frame));
 	if (bytes < 0)
 	{
-		return bytes;
+		return CANLIB_ERR_IO;
 	}
 
 	return bytes;
@@ -147,7 +147,7 @@ int canlib_close(int can_sock)
 
 	if (status < 0)
 	{
-		return errno;
+		return CANLIB_ERR_IO;
 	}
-	return 0;
+	return CANLIB_OK;
 }
