@@ -144,7 +144,7 @@ int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
  *         CANLIB_ERR_PARAM if invalid parameters
  *         CANLIB_ERR_IO if write operation fails
  */
-int canlib_send(int can_sock, canlib_frame_t *can_frame)
+int canlib_send(int can_sock, const canlib_frame_t *can_frame)
 {
 	if (can_frame == NULL || can_sock < 0) {
 		errno = EINVAL;
