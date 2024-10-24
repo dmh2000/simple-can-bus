@@ -62,3 +62,4 @@ Module.symvers
 # vendor/
 *.x86_64
 .aider*
+.env

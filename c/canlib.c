@@ -1,5 +1,3 @@
-#include <sys/socket.h>
-#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <unistd.h>
 #include <net/if.h>
