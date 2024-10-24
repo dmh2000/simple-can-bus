@@ -84,7 +84,7 @@ int canlib_init(const char *can_dev)
  */
 int canlib_receive(int can_sock, canlib_frame_t *can_frame, int timeout_ms)
 {
-	if (can_frame == NULL || can_sock < 0) {
+	if (can_frame == NULL || can_sock < 0 || timeout_ms < 0) {
 		errno = EINVAL;
 		return CANLIB_ERR_PARAM;
 	}

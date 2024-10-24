@@ -38,8 +38,9 @@ int canlib_init(const char *can_dev);
  * 
  * @param can_sock Socket descriptor from canlib_init
  * @param frame Pointer to frame structure to store received data
- * @param timeout_ms Timeout in milliseconds
- * @return Number of bytes read on success, CANLIB_ERR_TIMEOUT on timeout, negative error code on failure
+ * @param timeout_ms Timeout in milliseconds (must be non-negative)
+ * @return Number of bytes read on success, CANLIB_ERR_TIMEOUT on timeout, CANLIB_ERR_PARAM if timeout_ms is negative,
+ *         or other negative error code on failure
  */
 int canlib_receive(int can_sock, canlib_frame_t *frame, int timeout_ms);
 
