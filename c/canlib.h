@@ -23,8 +23,6 @@ typedef struct canlib_frame
     unsigned char data[CAN_MAX_DATA_LEN];
 } canlib_frame_t;
 
-struct canlib_frame;
-
 // @return socket, < 0 if error
 int canlib_init(const char *can_dev);
 // @return bytes read, 0 if timeout, < 0 if error
