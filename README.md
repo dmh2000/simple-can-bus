@@ -6,11 +6,11 @@ This project is a collection of Go and C libraries and programs that set up a ve
 
 The primary sources I used for figuring out CAN and vcan.
 
--https://netmodule-linux.readthedocs.io/en/latest/howto/can.html
--https://github.com/linux-can/can-utils
--https://docs.kernel.org/networking/can.html
--https://elinux.org/CAN_Bus
--https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
+- https://netmodule-linux.readthedocs.io/en/latest/howto/can.html
+- https://github.com/linux-can/can-utils
+- https://docs.kernel.org/networking/can.html
+- https://elinux.org/CAN_Bus
+- https://www.pragmaticlinux.com/2021/10/how-to-create-a-virtual-can-interface-on-linux/
 
 ## CAN Bus
 
